@@ -38,4 +38,9 @@ Everything lives in `index.html` in three blocks:
 
 ## Git & GitHub
 
-All changes should be committed with clean messages and pushed to `https://github.com/haizen2180/salesdash`. No CI, no branch strategy — commit directly to `main`.
+**Commit and push after every meaningful change.** This is non-negotiable — the user relies on GitHub as the source of truth and recovery point for all work. Do not batch up multiple features before committing.
+
+- Push to `https://github.com/haizen2180/salesdash`, directly to `main`, after every task
+- Write descriptive commit messages that explain *what changed and why*, not just "update index.html"
+- If a session involves multiple distinct changes (e.g. a design fix + a new feature), commit them separately with individual messages
+- Never leave a session without the latest state pushed to GitHub
