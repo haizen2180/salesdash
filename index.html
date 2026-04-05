@@ -1251,7 +1251,7 @@
         <div style="display:flex;align-items:flex-start;gap:16px">
           <div style="flex:1">
             <label>Demos Showed</label>
-            <input type="number" id="m_demosShowed" placeholder="0" oninput="calcConversion()">
+            <input type="number" id="m_demosShowed" placeholder="0" oninput="calcConversion(); debounceSaveMonthly()">
             <div class="char-hint" id="m_bookedHint"></div>
             <input type="number" id="m_demosBooked" style="display:none" readonly>
           </div>
@@ -1259,10 +1259,6 @@
             <span class="conversion-rate" id="conversionRate" style="font-size:28px">—</span>
             <div class="conversion-label">Show Rate</div>
           </div>
-        </div>
-        <div class="field" style="margin-top:14px;margin-bottom:0">
-          <label>No-Show Notes</label>
-          <textarea id="m_demoNotes" class="short" placeholder="If show rate is low, why?"></textarea>
         </div>
       </div>
     </div>
@@ -1272,11 +1268,12 @@
       <div class="section-header">
         <span class="section-icon">🛡️</span>
         <span class="section-title">Objection Bank</span>
+        <div class="section-badge" id="objGapCount" style="display:none;background:var(--amber-dim);color:var(--amber)"></div>
       </div>
       <div class="section-body">
         <div class="field">
-          <label>Weak Responses — What Are You Rewriting?</label>
-          <textarea id="m_weakResponses" class="short" placeholder="Which ones aren't landing? Write your rewrites here."></textarea>
+          <label>Demo No-Shows — What's the Pattern?</label>
+          <textarea id="m_demoNotes" class="short" placeholder="Why are booked demos not showing up? Commitment issue? Wrong prospect?"></textarea>
         </div>
         <div class="divider"></div>
         <div class="obj-search">
@@ -1875,7 +1872,6 @@ function goCurrentMonth() {
 function loadMonthlyEntry() {
   const key = getMonthKey(currentMonthOffset);
   const data = JSON.parse(localStorage.getItem(key) || '{}');
-  document.getElementById('m_weakResponses').value = data.weakResponses || '';
   document.getElementById('m_demosShowed').value = data.demosShowed || '';
   document.getElementById('m_demoNotes').value = data.demoNotes || '';
   renderContentLog(data.contentLog || []);
@@ -1904,11 +1900,16 @@ function calcConversion() {
 function saveMonthly() {
   const key = getMonthKey(currentMonthOffset);
   const data = JSON.parse(localStorage.getItem(key) || '{}');
-  data.weakResponses = document.getElementById('m_weakResponses').value.trim();
-  data.demosShowed   = document.getElementById('m_demosShowed').value.trim();
-  data.demoNotes     = document.getElementById('m_demoNotes').value.trim();
+  data.demosShowed = document.getElementById('m_demosShowed').value.trim();
+  data.demoNotes   = document.getElementById('m_demoNotes').value.trim();
   localStorage.setItem(key, JSON.stringify(data));
   showToast('Monthly review saved');
+}
+
+let _monthSaveTimer;
+function debounceSaveMonthly() {
+  clearTimeout(_monthSaveTimer);
+  _monthSaveTimer = setTimeout(saveMonthly, 800);
 }
 
 function addContentEntry() {
@@ -2118,6 +2119,17 @@ function renderObjectionBank() {
 
   const countEl = document.getElementById('objectionCount');
   if (countEl) countEl.textContent = allArr.length + ' ' + (allArr.length === 1 ? 'entry' : 'entries');
+
+  const noResponse = allArr.filter(o => !o.response || !o.response.trim()).length;
+  const gapEl = document.getElementById('objGapCount');
+  if (gapEl) {
+    if (noResponse > 0) {
+      gapEl.textContent = noResponse + ' without a response';
+      gapEl.style.display = '';
+    } else {
+      gapEl.style.display = 'none';
+    }
+  }
 
   function buildHtml(arr) {
     if (!arr.length) return '<div class="empty-state">No objections match your search.</div>';
