@@ -8,52 +8,36 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:           #060606;
-      --surface:      #0e0e0e;
-      --surface-alt:  #131313;
-      --surface-hi:   #1a1200;
-      --border:       #1e1200;
-      --border-mid:   #3d2600;
-      --border-hi:    #ff6600;
-      --text:         #e07830;
-      --text-bright:  #ff9040;
-      --text-muted:   #6b3a18;
-      --accent:       #ff6600;
-      --accent-glow:  rgba(255,102,0,0.35);
-      --accent-dim:   rgba(255,102,0,0.08);
-      --amber:        #ffaa00;
-      --amber-dim:    rgba(255,170,0,0.08);
-      --red:          #ff2a00;
-      --red-dim:      rgba(255,42,0,0.08);
-      --green:        #00e87a;
-      --green-dim:    rgba(0,232,122,0.07);
-      --radius:       0px;
-      --font:         'Courier New', 'Lucida Console', monospace;
+      --bg:          #0a0a0a;
+      --surface:     #141414;
+      --surface-alt: #1c1c1c;
+      --surface-hi:  #1f1500;
+      --border:      #252525;
+      --border-mid:  #2e2e2e;
+      --text:        #e8e0d8;
+      --text-muted:  #6b6560;
+      --accent:      #ff6600;
+      --accent-glow: rgba(255,102,0,0.25);
+      --accent-dim:  rgba(255,102,0,0.1);
+      --amber:       #f59e0b;
+      --amber-dim:   rgba(245,158,11,0.1);
+      --red:         #ef4444;
+      --red-dim:     rgba(239,68,68,0.1);
+      --green:       #22c55e;
+      --green-dim:   rgba(34,197,94,0.1);
+      --radius:      10px;
+      --radius-sm:   7px;
+      --shadow:      0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+      --shadow-md:   0 4px 12px rgba(0,0,0,0.5);
     }
 
     body {
-      font-family: var(--font);
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      font-size: 13px;
+      font-size: 14px;
       line-height: 1.5;
-    }
-
-    /* scanlines */
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 3px,
-        rgba(0,0,0,0.18) 3px,
-        rgba(0,0,0,0.18) 4px
-      );
-      pointer-events: none;
-      z-index: 9999;
     }
 
     /* ── Header ── */
@@ -64,20 +48,18 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 52px;
+      height: 56px;
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: 0 0 20px rgba(255,102,0,0.08);
+      box-shadow: var(--shadow);
     }
 
     .logo {
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: 3px;
-      text-transform: uppercase;
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
       color: var(--accent);
-      text-shadow: 0 0 12px var(--accent-glow), 0 0 30px rgba(255,102,0,0.2);
     }
 
     .header-right {
@@ -87,10 +69,9 @@
     }
 
     .header-date {
-      font-size: 11px;
+      font-size: 12px;
       color: var(--text-muted);
-      letter-spacing: 1px;
-      text-transform: uppercase;
+      font-weight: 500;
     }
 
     .header-actions { display: flex; gap: 8px; }
@@ -104,18 +85,15 @@
     }
 
     .tab-btn {
-      padding: 13px 18px;
-      font-size: 11px;
-      font-weight: 700;
-      font-family: var(--font);
-      letter-spacing: 2px;
-      text-transform: uppercase;
+      padding: 14px 18px;
+      font-size: 13px;
+      font-weight: 600;
       color: var(--text-muted);
       background: none;
       border: none;
       border-bottom: 2px solid transparent;
       cursor: pointer;
-      transition: all 0.15s;
+      transition: color 0.15s, border-color 0.15s;
     }
 
     .tab-btn:hover { color: var(--text); }
@@ -123,7 +101,6 @@
     .tab-btn.active {
       color: var(--accent);
       border-bottom-color: var(--accent);
-      text-shadow: 0 0 10px var(--accent-glow);
     }
 
     /* ── Layout ── */
@@ -140,15 +117,14 @@
     .section {
       background: var(--surface);
       border: 1px solid var(--border-mid);
-      margin-bottom: 18px;
+      border-radius: var(--radius);
+      margin-bottom: 16px;
       overflow: hidden;
-      transition: border-color 0.2s;
+      box-shadow: var(--shadow);
     }
 
-    .section:hover { border-color: #4a2e00; }
-
     .section-header {
-      padding: 12px 18px;
+      padding: 14px 18px;
       border-bottom: 1px solid var(--border-mid);
       display: flex;
       align-items: center;
@@ -156,28 +132,35 @@
       background: var(--surface-alt);
     }
 
-    .section-icon { font-size: 14px; }
+    .section-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: var(--accent-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
 
     .section-title {
-      font-size: 10px;
+      font-size: 13px;
       font-weight: 700;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      color: var(--accent);
-      text-shadow: 0 0 8px var(--accent-glow);
+      color: var(--text);
     }
 
     .section-badge {
       margin-left: auto;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 2px 8px;
-      border: 1px solid var(--border-mid);
-      color: var(--text-muted);
-      letter-spacing: 1px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 9px;
+      border-radius: 20px;
+      background: var(--accent-dim);
+      color: var(--accent);
     }
 
-    .section-body { padding: 18px; }
+    .section-body { padding: 20px; }
 
     /* ── Fields ── */
     .field { margin-bottom: 16px; }
@@ -185,12 +168,10 @@
 
     label {
       display: block;
-      font-size: 10px;
-      font-weight: 700;
+      font-size: 12px;
+      font-weight: 600;
       color: var(--text-muted);
       margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
     }
 
     input[type="text"],
@@ -199,12 +180,13 @@
     textarea,
     select {
       width: 100%;
-      padding: 8px 11px;
+      padding: 9px 12px;
       background: var(--surface-alt);
       border: 1px solid var(--border-mid);
-      font-size: 13px;
-      color: var(--text-bright);
-      font-family: var(--font);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      color: var(--text);
+      font-family: inherit;
       transition: border-color 0.15s, box-shadow 0.15s;
       resize: vertical;
       outline: none;
@@ -214,75 +196,73 @@
     input[type="number"]:focus,
     textarea:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 1px var(--accent), 0 0 14px rgba(255,102,0,0.2);
+      box-shadow: 0 0 0 3px var(--accent-dim);
       background: var(--surface-hi);
     }
 
-    textarea { min-height: 76px; }
-    textarea.short { min-height: 54px; }
+    textarea { min-height: 80px; }
+    textarea.short { min-height: 58px; }
 
     .char-hint {
-      font-size: 10px;
+      font-size: 11px;
       color: var(--text-muted);
       margin-top: 4px;
-      letter-spacing: 0.5px;
     }
 
     /* ── Buttons ── */
     .btn {
       padding: 9px 18px;
-      font-size: 11px;
-      font-weight: 700;
-      font-family: var(--font);
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
       cursor: pointer;
-      border: 1px solid;
+      border: none;
       transition: all 0.15s;
     }
 
     .btn-primary {
-      background: transparent;
-      border-color: var(--accent);
-      color: var(--accent);
+      background: var(--accent);
+      color: #fff;
     }
 
     .btn-primary:hover {
-      background: var(--accent);
-      color: #000;
+      background: #e55a00;
       box-shadow: 0 0 16px var(--accent-glow);
     }
 
     .btn-secondary {
-      background: transparent;
-      border-color: var(--border-mid);
+      background: var(--surface-alt);
       color: var(--text-muted);
+      border: 1px solid var(--border-mid);
     }
 
-    .btn-secondary:hover { border-color: var(--text-muted); color: var(--text); }
+    .btn-secondary:hover { color: var(--text); border-color: #444; }
 
     .btn-danger {
-      background: transparent;
-      border-color: var(--red);
+      background: var(--red-dim);
       color: var(--red);
+      border: 1px solid transparent;
     }
 
-    .btn-danger:hover { background: var(--red-dim); }
+    .btn-danger:hover { background: rgba(239,68,68,0.18); }
 
-    .btn-sm { padding: 5px 10px; font-size: 10px; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
 
     .btn-icon {
-      padding: 7px 10px;
+      padding: 7px 13px;
       font-size: 13px;
-      background: transparent;
+      font-weight: 500;
+      font-family: inherit;
+      background: var(--surface-alt);
       border: 1px solid var(--border-mid);
+      border-radius: var(--radius-sm);
       color: var(--text-muted);
       cursor: pointer;
-      font-family: var(--font);
       transition: all 0.15s;
     }
 
-    .btn-icon:hover { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
+    .btn-icon:hover { border-color: var(--accent); color: var(--accent); }
 
     .btn-row {
       display: flex;
@@ -292,30 +272,28 @@
     }
 
     .btn-hint {
-      font-size: 10px;
+      font-size: 12px;
       color: var(--text-muted);
-      letter-spacing: 0.5px;
     }
 
     /* ── Toast ── */
     .toast {
       position: fixed;
-      bottom: 22px;
-      right: 22px;
+      bottom: 24px;
+      right: 24px;
       background: var(--surface);
-      border: 1px solid var(--accent);
-      color: var(--accent);
-      padding: 10px 16px;
-      font-size: 11px;
-      font-family: var(--font);
-      letter-spacing: 1px;
-      text-transform: uppercase;
+      border: 1px solid var(--border-mid);
+      color: var(--text);
+      padding: 11px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
       opacity: 0;
       transform: translateY(8px);
       transition: all 0.2s;
       z-index: 9998;
       pointer-events: none;
-      box-shadow: 0 0 20px var(--accent-glow);
+      box-shadow: var(--shadow-md);
     }
 
     .toast.show { opacity: 1; transform: translateY(0); }
@@ -325,25 +303,27 @@
 
     .rating-btn {
       flex: 1;
-      padding: 12px;
+      padding: 14px 10px;
       border: 1px solid var(--border-mid);
+      border-radius: var(--radius-sm);
       background: var(--surface-alt);
       cursor: pointer;
       text-align: center;
       transition: all 0.15s;
-      font-family: var(--font);
+      font-family: inherit;
     }
 
     .rating-btn:hover { border-color: var(--accent); }
 
-    .rating-btn.sel-1 { border-color: var(--red); background: var(--red-dim); box-shadow: 0 0 10px rgba(255,42,0,0.2); }
-    .rating-btn.sel-2 { border-color: var(--amber); background: var(--amber-dim); box-shadow: 0 0 10px rgba(255,170,0,0.2); }
-    .rating-btn.sel-3 { border-color: var(--green); background: var(--green-dim); box-shadow: 0 0 12px rgba(0,232,122,0.2); }
+    .rating-btn.sel-1 { border-color: var(--red); background: var(--red-dim); }
+    .rating-btn.sel-2 { border-color: var(--amber); background: var(--amber-dim); }
+    .rating-btn.sel-3 { border-color: var(--green); background: var(--green-dim); }
 
     .rating-num {
-      font-size: 22px;
-      font-weight: 700;
+      font-size: 24px;
+      font-weight: 800;
       display: block;
+      line-height: 1;
     }
 
     .rating-btn:nth-child(1) .rating-num { color: var(--red); }
@@ -351,13 +331,11 @@
     .rating-btn:nth-child(3) .rating-num { color: var(--green); }
 
     .rating-label {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
+      font-size: 11px;
+      font-weight: 600;
       color: var(--text-muted);
       display: block;
-      margin-top: 3px;
+      margin-top: 5px;
     }
 
     /* ── Date Nav ── */
@@ -365,58 +343,63 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .date-nav input[type="date"] {
       flex: 1;
-      padding: 7px 10px;
+      padding: 8px 12px;
       background: var(--surface);
       border: 1px solid var(--border-mid);
-      font-size: 12px;
-      font-weight: 700;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
       color: var(--text);
-      font-family: var(--font);
-      letter-spacing: 1px;
+      font-family: inherit;
       cursor: pointer;
       outline: none;
     }
 
     .date-nav input[type="date"]:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 10px var(--accent-glow);
+      box-shadow: 0 0 0 3px var(--accent-dim);
     }
 
     /* week strip */
     .week-strip {
       display: flex;
-      gap: 4px;
+      gap: 6px;
       margin-bottom: 24px;
-      justify-content: center;
     }
 
     .week-day {
       flex: 1;
       text-align: center;
-      padding: 6px 4px;
+      padding: 8px 4px;
       border: 1px solid var(--border-mid);
+      border-radius: var(--radius-sm);
       background: var(--surface);
+      cursor: pointer;
+      transition: border-color 0.15s;
     }
 
+    .week-day:hover { border-color: #444; }
+
     .week-day-label {
-      font-size: 9px;
+      font-size: 10px;
       font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
       color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .week-day-dot {
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      margin: 5px auto 0;
+      margin: 6px auto 0;
       background: var(--border-mid);
+      transition: background 0.15s;
     }
 
     .week-day.has-entry .week-day-dot {
@@ -426,11 +409,10 @@
 
     .week-day.is-today {
       border-color: var(--accent);
+      background: var(--accent-dim);
     }
 
-    .week-day.is-today .week-day-label {
-      color: var(--accent);
-    }
+    .week-day.is-today .week-day-label { color: var(--accent); }
 
     /* ── Skill Chips ── */
     .skill-chips {
@@ -441,13 +423,12 @@
     }
 
     .skill-chip {
-      padding: 4px 10px;
+      padding: 5px 12px;
       border: 1px solid var(--border-mid);
+      border-radius: 20px;
       background: var(--surface-alt);
-      font-size: 11px;
-      font-family: var(--font);
-      font-weight: 700;
-      letter-spacing: 0.5px;
+      font-size: 12px;
+      font-weight: 500;
       color: var(--text-muted);
       cursor: pointer;
       transition: all 0.15s;
@@ -459,17 +440,15 @@
       border-color: var(--accent);
       background: var(--accent-dim);
       color: var(--accent);
-      text-shadow: 0 0 8px var(--accent-glow);
+      font-weight: 600;
     }
 
-    .skill-chip.custom-chip {
-      border-style: dashed;
-    }
+    .skill-chip.custom-chip { border-style: dashed; }
 
     .skill-chip-del {
       margin-left: 5px;
       opacity: 0.5;
-      font-size: 12px;
+      font-size: 13px;
     }
 
     .skill-chip-del:hover { opacity: 1; color: var(--red); }
@@ -480,7 +459,8 @@
     .log-item {
       background: var(--surface-alt);
       border: 1px solid var(--border-mid);
-      padding: 11px 13px;
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
       display: flex;
       align-items: flex-start;
       gap: 12px;
@@ -488,18 +468,16 @@
 
     .log-item-meta {
       flex-shrink: 0;
-      font-size: 10px;
+      font-size: 11px;
       color: var(--text-muted);
-      font-weight: 700;
-      min-width: 64px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
+      font-weight: 600;
+      min-width: 60px;
     }
 
     .log-item-content { flex: 1; }
 
     .log-item-row {
-      font-size: 12px;
+      font-size: 13px;
       color: var(--text);
       margin-bottom: 4px;
       line-height: 1.4;
@@ -508,10 +486,10 @@
     .log-item-row:last-child { margin-bottom: 0; }
 
     .log-item-row span {
-      font-size: 9px;
+      font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
       margin-right: 6px;
     }
 
@@ -527,7 +505,7 @@
       border: none;
       color: var(--text-muted);
       cursor: pointer;
-      font-size: 16px;
+      font-size: 18px;
       padding: 0;
       line-height: 1;
       opacity: 0.3;
@@ -538,12 +516,11 @@
 
     .empty-state {
       text-align: center;
-      padding: 22px;
+      padding: 28px;
       color: var(--text-muted);
-      font-size: 11px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
+      font-size: 13px;
       border: 1px dashed var(--border-mid);
+      border-radius: var(--radius-sm);
     }
 
     /* ── Objection Bank ── */
@@ -555,50 +532,52 @@
 
     .obj-search input {
       flex: 1;
-      padding: 7px 10px;
+      padding: 8px 12px;
       background: var(--surface-alt);
       border: 1px solid var(--border-mid);
-      font-size: 12px;
-      color: var(--text-bright);
-      font-family: var(--font);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      color: var(--text);
+      font-family: inherit;
       outline: none;
     }
 
     .obj-search input:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 8px var(--accent-glow);
+      box-shadow: 0 0 0 3px var(--accent-dim);
     }
 
     .objection-form {
       display: flex;
       flex-direction: column;
-      gap: 9px;
-      margin-bottom: 14px;
-      padding-bottom: 14px;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
       border-bottom: 1px solid var(--border-mid);
     }
 
     .objection-item {
       background: var(--surface-alt);
       border: 1px solid var(--border-mid);
-      padding: 13px;
+      border-radius: var(--radius-sm);
+      padding: 14px;
       margin-bottom: 8px;
       transition: border-color 0.15s;
     }
 
-    .objection-item:hover { border-color: #4a2e00; }
+    .objection-item:hover { border-color: #3a3a3a; }
     .objection-item:last-child { margin-bottom: 0; }
 
     .objection-q {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-bright);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
       margin-bottom: 6px;
       line-height: 1.4;
     }
 
     .objection-a {
-      font-size: 12px;
+      font-size: 13px;
       color: var(--text-muted);
       line-height: 1.5;
     }
@@ -608,14 +587,13 @@
       align-items: center;
       justify-content: space-between;
       margin-top: 10px;
-      padding-top: 8px;
+      padding-top: 10px;
       border-top: 1px solid var(--border-mid);
     }
 
     .objection-date {
-      font-size: 10px;
+      font-size: 11px;
       color: var(--text-muted);
-      letter-spacing: 0.5px;
     }
 
     .objection-actions { display: flex; gap: 6px; }
@@ -630,7 +608,7 @@
     .objection-item.editing .objection-edit-form { display: flex; }
     .objection-item.editing .objection-view { display: none; }
 
-    /* ── Week Nav ── */
+    /* ── Period Nav ── */
     .period-nav {
       display: flex;
       align-items: center;
@@ -641,13 +619,13 @@
     .period-label {
       flex: 1;
       text-align: center;
-      font-size: 12px;
-      font-weight: 700;
+      font-size: 13px;
+      font-weight: 600;
       color: var(--text);
       background: var(--surface);
       border: 1px solid var(--border-mid);
-      padding: 7px 12px;
-      letter-spacing: 1px;
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
     }
 
     /* ── Stats ── */
@@ -655,58 +633,57 @@
     .stat-input-group { flex: 1; }
 
     .conversion-display {
+      background: var(--accent-dim);
       border: 1px solid var(--accent);
-      padding: 14px;
+      border-radius: var(--radius-sm);
+      padding: 20px;
       text-align: center;
-      margin-top: 12px;
-      box-shadow: 0 0 20px var(--accent-glow), inset 0 0 20px rgba(255,102,0,0.04);
+      margin-top: 14px;
     }
 
     .conversion-rate {
-      font-size: 36px;
-      font-weight: 700;
+      font-size: 40px;
+      font-weight: 800;
       color: var(--accent);
-      text-shadow: 0 0 20px var(--accent-glow);
       display: block;
+      line-height: 1;
     }
 
     .conversion-label {
-      font-size: 10px;
-      font-weight: 700;
+      font-size: 11px;
+      font-weight: 600;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-top: 2px;
+      letter-spacing: 1px;
+      margin-top: 4px;
     }
 
     /* ── Weekly summary ── */
-    .week-summary {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
+    .week-summary { display: flex; flex-direction: column; gap: 6px; }
 
     .week-summary-row {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 8px 10px;
+      gap: 12px;
+      padding: 9px 12px;
       background: var(--surface-alt);
       border: 1px solid var(--border-mid);
-      font-size: 11px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
     }
 
     .wsr-date {
-      font-weight: 700;
+      font-weight: 600;
       color: var(--text-muted);
-      min-width: 50px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
+      min-width: 52px;
+      font-size: 12px;
     }
 
     .wsr-skill {
       flex: 1;
       color: var(--accent);
+      font-weight: 500;
+      font-size: 12px;
     }
 
     .wsr-worked { flex: 2; color: var(--text); }
@@ -714,11 +691,11 @@
     .skill-agg { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
 
     .skill-agg-item {
-      padding: 5px 10px;
+      padding: 5px 12px;
       border: 1px solid var(--border-mid);
-      font-size: 10px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
+      border-radius: 20px;
+      font-size: 12px;
+      background: var(--surface-alt);
     }
 
     .agg-name { color: var(--text-muted); }
@@ -728,13 +705,11 @@
     .divider {
       height: 1px;
       background: var(--border-mid);
-      margin: 16px 0;
+      margin: 18px 0;
     }
 
     /* ── File input ── */
-    input[type="file"] {
-      display: none;
-    }
+    input[type="file"] { display: none; }
   </style>
 </head>
 <body>
@@ -775,7 +750,7 @@
     <!-- Before Dials -->
     <div class="section">
       <div class="section-header">
-        <span class="section-icon">&#9654;</span>
+        <span class="section-icon">🎯</span>
         <span class="section-title">Before Dials</span>
       </div>
       <div class="section-body">
@@ -809,7 +784,7 @@
     <!-- After Dials -->
     <div class="section">
       <div class="section-header">
-        <span class="section-icon">&#9724;</span>
+        <span class="section-icon">📊</span>
         <span class="section-title">After Dials</span>
       </div>
       <div class="section-body">
@@ -835,13 +810,13 @@
         <div class="field">
           <label>One Thing That Worked</label>
           <textarea id="thingWorked" class="short" placeholder="One sentence."></textarea>
-          <div class="char-hint">// pattern tracker — keep it to one sentence</div>
+          <div class="char-hint">Pattern tracker — keep it to one sentence</div>
         </div>
 
         <div class="field">
           <label>One Thing You Changed</label>
           <textarea id="thingChanged" class="short" placeholder="One sentence."></textarea>
-          <div class="char-hint">// pattern tracker — keep it to one sentence</div>
+          <div class="char-hint">Pattern tracker — keep it to one sentence</div>
         </div>
 
         <div class="btn-row">
@@ -854,7 +829,7 @@
     <!-- Pattern Log -->
     <div class="section">
       <div class="section-header">
-        <span class="section-icon">&#9632;</span>
+        <span class="section-icon">📈</span>
         <span class="section-title">Pattern Log</span>
         <div class="section-badge" id="patternCount">0 entries</div>
       </div>
@@ -880,7 +855,7 @@
     <!-- This week's daily summary (auto-pulled) -->
     <div class="section">
       <div class="section-header">
-        <span class="section-icon">&#9670;</span>
+        <span class="section-icon">🔹</span>
         <span class="section-title">This Week's Daily Log</span>
         <div class="section-badge">auto-pulled</div>
       </div>
@@ -897,7 +872,7 @@
     <!-- Call Patterns -->
     <div class="section">
       <div class="section-header">
-        <span class="section-icon">&#9670;</span>
+        <span class="section-icon">🔹</span>
         <span class="section-title">Call Pattern Analysis</span>
       </div>
       <div class="section-body">
@@ -915,7 +890,7 @@
     <!-- Call Replay -->
     <div class="section">
       <div class="section-header">
-        <span class="section-icon">&#9670;</span>
+        <span class="section-icon">🔹</span>
         <span class="section-title">Call Replay Notes</span>
       </div>
       <div class="section-body">
@@ -933,7 +908,7 @@
     <!-- Objection Bank -->
     <div class="section">
       <div class="section-header">
-        <span class="section-icon">&#9670;</span>
+        <span class="section-icon">🔹</span>
         <span class="section-title">Objection Bank</span>
         <div class="section-badge" id="objectionCount">0 entries</div>
       </div>
@@ -950,7 +925,7 @@
           <button class="btn btn-primary btn-sm" style="align-self:flex-start" onclick="addObjection()">+ Add to Bank</button>
         </div>
         <div class="obj-search">
-          <input type="text" id="objSearchInput" placeholder="// search objections..." oninput="renderObjectionBank()">
+          <input type="text" id="objSearchInput" placeholder="Search objections..." oninput="renderObjectionBank()">
         </div>
         <div id="objectionBank"></div>
       </div>
@@ -959,7 +934,7 @@
     <!-- Next Week Focus -->
     <div class="section">
       <div class="section-header">
-        <span class="section-icon">&#9670;</span>
+        <span class="section-icon">🔹</span>
         <span class="section-title">Skill Focus — Next Week</span>
       </div>
       <div class="section-body">
@@ -991,7 +966,7 @@
     <!-- Objection Bank Review -->
     <div class="section">
       <div class="section-header">
-        <span class="section-icon">&#9670;</span>
+        <span class="section-icon">🔹</span>
         <span class="section-title">Objection Bank Review</span>
       </div>
       <div class="section-body">
@@ -1002,7 +977,7 @@
         <div class="divider"></div>
         <label style="margin-bottom:10px">Live Objection Bank</label>
         <div class="obj-search">
-          <input type="text" id="objSearchMonthly" placeholder="// search objections..." oninput="renderObjectionBank()">
+          <input type="text" id="objSearchMonthly" placeholder="Search objections..." oninput="renderObjectionBank()">
         </div>
         <div id="objectionBankMonthly"></div>
       </div>
@@ -1011,7 +986,7 @@
     <!-- Demo Conversion -->
     <div class="section">
       <div class="section-header">
-        <span class="section-icon">&#9670;</span>
+        <span class="section-icon">🔹</span>
         <span class="section-title">Demo Conversion Rate</span>
       </div>
       <div class="section-body">
@@ -1042,7 +1017,7 @@
     <!-- Sales Content -->
     <div class="section">
       <div class="section-header">
-        <span class="section-icon">&#9670;</span>
+        <span class="section-icon">🔹</span>
         <span class="section-title">Sales Content This Month</span>
       </div>
       <div class="section-body">
@@ -1143,7 +1118,7 @@ function fmtDay(str) {
 
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = '> ' + msg;
+  t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2200);
 }
@@ -1368,7 +1343,7 @@ function renderPatternLog() {
   document.getElementById('patternCount').textContent = log.length + ' ' + (log.length === 1 ? 'entry' : 'entries');
 
   if (!log.length) {
-    document.getElementById('patternLog').innerHTML = '<div class="empty-state">// No entries yet. Complete After Dials to start tracking.</div>';
+    document.getElementById('patternLog').innerHTML = '<div class="empty-state">No entries yet — complete After Dials to start tracking patterns.</div>';
     return;
   }
 
@@ -1457,7 +1432,7 @@ function renderWeekDailySummary() {
 
   const summaryEl = document.getElementById('weekDailySummary');
   if (!entries.length) {
-    summaryEl.innerHTML = '<div class="empty-state">// No daily entries found for this week.</div>';
+    summaryEl.innerHTML = '<div class="empty-state">No daily entries found for this week.</div>';
   } else {
     summaryEl.innerHTML = '<div class="week-summary">' + entries.map(e => `
       <div class="week-summary-row">
@@ -1473,7 +1448,7 @@ function renderWeekDailySummary() {
   const aggEl = document.getElementById('skillAggDisplay');
   const keys = Object.keys(skillRatings);
   if (!keys.length) {
-    aggEl.innerHTML = '<span style="color:var(--text-muted);font-size:10px;letter-spacing:1px">// No rated sessions this week.</span>';
+    aggEl.innerHTML = '<span style="color:var(--text-muted);font-size:12px">No rated sessions this week.</span>';
   } else {
     aggEl.innerHTML = keys.map(skill => {
       const ratings = skillRatings[skill];
@@ -1639,7 +1614,7 @@ function renderObjectionBank() {
   if (countEl) countEl.textContent = allArr.length + ' ' + (allArr.length === 1 ? 'entry' : 'entries');
 
   function buildHtml(arr) {
-    if (!arr.length) return '<div class="empty-state">// No objections match.</div>';
+    if (!arr.length) return '<div class="empty-state">No objections match your search.</div>';
     return arr.map(o => `
       <div class="objection-item" data-id="${o.id}">
         <div class="objection-view">
