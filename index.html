@@ -74,7 +74,7 @@
       font-weight: 500;
     }
 
-    .header-actions { display: flex; gap: 8px; }
+    .header-actions { display: flex; gap: 8px; align-items: center; }
 
     /* ── Tabs ── */
     .tab-nav {
@@ -848,7 +848,7 @@
     <div class="header-date" id="headerDate"></div>
     <div class="header-actions">
       <button class="btn-icon" onclick="exportData()" title="Export backup">&#8595; Export</button>
-      <label class="btn-icon" style="cursor:pointer" title="Import backup">
+      <label class="btn-icon" style="cursor:pointer;display:inline-flex;align-items:center" title="Import backup">
         &#8593; Import
         <input type="file" id="importFile" accept=".json" onchange="importData(event)">
       </label>
