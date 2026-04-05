@@ -709,6 +709,45 @@
       margin: 18px 0;
     }
 
+    /* ── Outcome pills in log ── */
+    .log-outcomes { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+
+    .outcome-pill {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 9px;
+      border-radius: 20px;
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    .outcome-pill-green { background: var(--green-dim); color: var(--green); }
+    .outcome-pill-amber { background: var(--amber-dim); color: var(--amber); }
+
+    /* ── Outcomes ── */
+    .outcomes-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .outcome-input { flex: 1; }
+
+    .outcome-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+      text-align: center;
+    }
+
+    .outcome-input input {
+      text-align: center;
+      font-size: 20px;
+      font-weight: 700;
+      padding: 10px;
+      color: var(--accent);
+    }
+
     /* ── File input ── */
     input[type="file"] { display: none; }
   </style>
@@ -766,6 +805,10 @@
         </div>
 
         <div class="field">
+          <label>Specifically, I will...</label>
+          <input type="text" id="skillHow" placeholder="e.g. When they say we're good, I'll ask what good looks like before backing off"></div>
+
+        <div class="field">
           <label>Objection You Got Yesterday</label>
           <textarea id="objectionYesterday" class="short" placeholder="What did they say that stopped the conversation?"></textarea>
         </div>
@@ -791,6 +834,24 @@
       <div class="section-body">
 
         <div class="field">
+          <label>Session Outcomes</label>
+          <div class="outcomes-row">
+            <div class="outcome-input">
+              <div class="outcome-label">Connects</div>
+              <input type="number" id="connects" placeholder="0" min="0">
+            </div>
+            <div class="outcome-input">
+              <div class="outcome-label">Demos Booked</div>
+              <input type="number" id="outcomeDemos" placeholder="0" min="0">
+            </div>
+            <div class="outcome-input">
+              <div class="outcome-label">Callbacks</div>
+              <input type="number" id="callbacks" placeholder="0" min="0">
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
           <label>Skill Rating — Did You Actually Do It?</label>
           <div class="rating-group" id="ratingGroup">
             <button class="rating-btn" onclick="selectRating(1)">
@@ -808,16 +869,21 @@
           </div>
         </div>
 
-        <div class="field">
-          <label>One Thing That Worked</label>
-          <textarea id="thingWorked" class="short" placeholder="One sentence."></textarea>
-          <div class="char-hint">Pattern tracker — keep it to one sentence</div>
+        <div class="field" id="blockedField" style="display:none">
+          <label>What Got in the Way?</label>
+          <textarea id="blockedBy" class="short" placeholder="Why didn't you execute the skill? Be specific — distraction, forgot, conversation moved too fast..."></textarea>
         </div>
 
         <div class="field">
-          <label>One Thing You Changed</label>
-          <textarea id="thingChanged" class="short" placeholder="One sentence."></textarea>
-          <div class="char-hint">Pattern tracker — keep it to one sentence</div>
+          <label>One Thing That Moved a Prospect Forward</label>
+          <textarea id="thingWorked" class="short" placeholder="What specifically worked in a conversation today?"></textarea>
+          <div class="char-hint">Pattern tracker — one sentence</div>
+        </div>
+
+        <div class="field">
+          <label>One Adjustment for the Next Dial</label>
+          <textarea id="thingChanged" class="short" placeholder="What will you do differently starting on the very next call?"></textarea>
+          <div class="char-hint">Pattern tracker — one sentence</div>
         </div>
 
         <div class="btn-row">
@@ -1192,6 +1258,7 @@ function loadDailyEntry() {
   const data = getDaily(date);
 
   document.getElementById('skillFocus').value = data.skillFocus || '';
+  document.getElementById('skillHow').value = data.skillHow || '';
   document.getElementById('objectionYesterday').value = data.objectionYesterday || '';
   document.getElementById('responseToday').value = data.responseToday || '';
 
@@ -1201,7 +1268,12 @@ function loadDailyEntry() {
   document.querySelectorAll('.rating-btn').forEach((b, i) => {
     b.className = 'rating-btn' + (selectedRating === i+1 ? ` sel-${i+1}` : '');
   });
+  updateBlockedVisibility();
 
+  document.getElementById('connects').value = data.connects || '';
+  document.getElementById('outcomeDemos').value = data.outcomeDemos || '';
+  document.getElementById('callbacks').value = data.callbacks || '';
+  document.getElementById('blockedBy').value = data.blockedBy || '';
   document.getElementById('thingWorked').value = data.thingWorked || '';
   document.getElementById('thingChanged').value = data.thingChanged || '';
 
@@ -1216,6 +1288,7 @@ function saveBefore() {
   const date = document.getElementById('dailyDate').value;
   const data = getDaily(date);
   data.skillFocus = document.getElementById('skillFocus').value.trim();
+  data.skillHow = document.getElementById('skillHow').value.trim();
   data.objectionYesterday = document.getElementById('objectionYesterday').value.trim();
   data.responseToday = document.getElementById('responseToday').value.trim();
   localStorage.setItem('daily_' + date, JSON.stringify(data));
@@ -1227,10 +1300,14 @@ function saveAfter() {
   const date = document.getElementById('dailyDate').value;
   const data = getDaily(date);
   data.rating = selectedRating;
+  data.connects = document.getElementById('connects').value.trim();
+  data.outcomeDemos = document.getElementById('outcomeDemos').value.trim();
+  data.callbacks = document.getElementById('callbacks').value.trim();
+  data.blockedBy = document.getElementById('blockedBy').value.trim();
   data.thingWorked = document.getElementById('thingWorked').value.trim();
   data.thingChanged = document.getElementById('thingChanged').value.trim();
   localStorage.setItem('daily_' + date, JSON.stringify(data));
-  if (data.thingWorked || data.thingChanged) addToPatternLog(date, data);
+  if (data.thingWorked || data.thingChanged || data.connects) addToPatternLog(date, data);
   renderWeekStrip(date);
   renderPatternLog();
   showToast('After dials saved');
@@ -1241,6 +1318,12 @@ function selectRating(n) {
   document.querySelectorAll('.rating-btn').forEach((b, i) => {
     b.className = 'rating-btn' + (i+1 === n ? ` sel-${i+1}` : '');
   });
+  updateBlockedVisibility();
+}
+
+function updateBlockedVisibility() {
+  const field = document.getElementById('blockedField');
+  field.style.display = (selectedRating === 1 || selectedRating === 2) ? 'block' : 'none';
 }
 
 // ── Skill Chips ──────────────────────────────────────────
@@ -1327,7 +1410,17 @@ function jumpToDate(ds) {
 function addToPatternLog(date, data) {
   let log = JSON.parse(localStorage.getItem('patternLog') || '[]');
   log = log.filter(e => e.date !== date);
-  log.unshift({ date, skill: data.skillFocus, rating: data.rating, worked: data.thingWorked, changed: data.thingChanged });
+  log.unshift({
+    date,
+    skill: data.skillFocus,
+    rating: data.rating,
+    connects: data.connects,
+    outcomeDemos: data.outcomeDemos,
+    callbacks: data.callbacks,
+    blockedBy: data.blockedBy,
+    worked: data.thingWorked,
+    changed: data.thingChanged
+  });
   log = log.slice(0, 90);
   localStorage.setItem('patternLog', JSON.stringify(log));
 }
@@ -1348,21 +1441,29 @@ function renderPatternLog() {
     return;
   }
 
-  document.getElementById('patternLog').innerHTML = '<div class="log-list">' + log.map(e => `
+  document.getElementById('patternLog').innerHTML = '<div class="log-list">' + log.map(e => {
+    const hasOutcomes = e.connects || e.outcomeDemos || e.callbacks;
+    return `
     <div class="log-item">
       <div class="log-item-meta">
         ${fmtShort(e.date)}<br>
         ${fmtDay(e.date)}
-        ${e.rating ? `<br><span class="tag-r${e.rating}">${['','1','2','3'][e.rating]}</span>` : ''}
+        ${e.rating ? `<br><span class="tag-r${e.rating}">${RATING_LABELS[e.rating]}</span>` : ''}
       </div>
       <div class="log-item-content">
-        ${e.skill ? `<div class="log-item-row" style="color:var(--accent);font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px">${e.skill}</div>` : ''}
+        ${e.skill ? `<div class="log-item-row" style="color:var(--accent);font-size:12px;font-weight:600;margin-bottom:5px">${e.skill}</div>` : ''}
+        ${hasOutcomes ? `<div class="log-item-row log-outcomes">
+          ${e.connects ? `<span class="outcome-pill">${e.connects} connects</span>` : ''}
+          ${e.outcomeDemos ? `<span class="outcome-pill outcome-pill-green">${e.outcomeDemos} demo${e.outcomeDemos > 1 ? 's' : ''}</span>` : ''}
+          ${e.callbacks ? `<span class="outcome-pill outcome-pill-amber">${e.callbacks} callback${e.callbacks > 1 ? 's' : ''}</span>` : ''}
+        </div>` : ''}
+        ${e.blockedBy ? `<div class="log-item-row"><span class="tag-r1">Blocked</span>${e.blockedBy}</div>` : ''}
         ${e.worked ? `<div class="log-item-row"><span class="tag-worked">Worked</span>${e.worked}</div>` : ''}
-        ${e.changed ? `<div class="log-item-row"><span class="tag-changed">Changed</span>${e.changed}</div>` : ''}
+        ${e.changed ? `<div class="log-item-row"><span class="tag-changed">Adjusted</span>${e.changed}</div>` : ''}
       </div>
       <button class="log-delete" onclick="deletePatternEntry('${e.date}')" title="Delete">×</button>
     </div>
-  `).join('') + '</div>';
+  `}).join('') + '</div>';
 }
 
 // ── Weekly ───────────────────────────────────────────────
@@ -1440,7 +1541,10 @@ function renderWeekDailySummary() {
         <span class="wsr-date">${fmtShort(e.date)}</span>
         <span class="wsr-skill">${e.skillFocus || '—'}</span>
         <span class="wsr-worked">${e.thingWorked ? e.thingWorked : '<span style="color:var(--text-muted)">no after-dials logged</span>'}</span>
-        ${e.rating ? `<span class="tag-r${e.rating}" style="font-size:10px;font-weight:700">${RATING_LABELS[e.rating]}</span>` : ''}
+        ${e.connects || e.outcomeDemos || e.callbacks ? `<span style="font-size:11px;color:var(--text-muted);white-space:nowrap">
+          ${e.connects ? `${e.connects}c` : ''}${e.outcomeDemos ? ` · ${e.outcomeDemos}d` : ''}${e.callbacks ? ` · ${e.callbacks}cb` : ''}
+        </span>` : ''}
+        ${e.rating ? `<span class="tag-r${e.rating}" style="font-size:11px;font-weight:700;white-space:nowrap">${RATING_LABELS[e.rating]}</span>` : ''}
       </div>
     `).join('') + '</div>';
   }
