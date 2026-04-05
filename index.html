@@ -709,6 +709,41 @@
       margin: 18px 0;
     }
 
+    /* ── Sub-tabs ── */
+    .sub-tab-nav {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border-mid);
+      border-radius: var(--radius);
+      padding: 4px;
+    }
+
+    .sub-tab-btn {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .sub-tab-btn:hover { color: var(--text); }
+
+    .sub-tab-btn.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .sub-tab-content { display: none; }
+    .sub-tab-content.active { display: block; }
+
     /* ── Week totals ── */
     .week-totals-row {
       display: flex;
@@ -972,158 +1007,182 @@
       <button class="btn-icon" onclick="goCurrentWeek()">This Week</button>
     </div>
 
-    <!-- This week's daily summary (auto-pulled) -->
-    <div class="section">
-      <div class="section-header">
-        <span class="section-icon">📋</span>
-        <span class="section-title">This Week's Daily Log</span>
-        <div class="section-badge">auto-pulled</div>
-      </div>
-      <div class="section-body">
-        <div id="weekOutcomeTotals"></div>
-        <div id="weekDailySummary"></div>
-        <div class="divider"></div>
-        <div>
-          <label style="margin-bottom:8px">Skill Rating Averages</label>
-          <div class="skill-agg" id="skillAggDisplay"></div>
-        </div>
-        <div class="divider"></div>
-        <div class="field" style="margin-bottom:0">
-          <label>Looking at this week's data — what's the pattern?</label>
-          <textarea id="w_synthesis" class="short" placeholder="Don't just describe what happened. What does it tell you about where you're at and what needs to change?"></textarea>
-        </div>
-      </div>
+    <div class="sub-tab-nav">
+      <button class="sub-tab-btn active" onclick="switchSubTab('review', this)">Review</button>
+      <button class="sub-tab-btn" onclick="switchSubTab('calls', this)">Calls</button>
+      <button class="sub-tab-btn" onclick="switchSubTab('plan', this)">Plan</button>
     </div>
 
-    <!-- Accountability Check-in -->
-    <div class="section">
-      <div class="section-header">
-        <span class="section-icon">✅</span>
-        <span class="section-title">Accountability Check-in</span>
-      </div>
-      <div class="section-body">
-        <div id="lastWeekCommitment"></div>
-        <div class="field" style="margin-bottom:0">
-          <label>How Did It Actually Go?</label>
-          <textarea id="w_accountability" class="short" placeholder="Be honest. Did you do it on every call, or just when you remembered? What got in the way?"></textarea>
-        </div>
-      </div>
-    </div>
+    <!-- ── Review ── -->
+    <div id="sub-review" class="sub-tab-content active">
 
-    <!-- What Worked -->
-    <div class="section">
-      <div class="section-header">
-        <span class="section-icon">🏆</span>
-        <span class="section-title">What Worked This Week</span>
-      </div>
-      <div class="section-body">
-        <div class="field">
-          <label>Line or Approach That Got a Positive Reaction</label>
-          <textarea id="w_winsLine" class="short" placeholder="What exact thing did you say that landed? Write it out word for word if you can."></textarea>
+      <div class="section">
+        <div class="section-header">
+          <span class="section-icon">📋</span>
+          <span class="section-title">This Week's Daily Log</span>
+          <div class="section-badge">auto-pulled</div>
         </div>
-        <div class="field" style="margin-bottom:0">
-          <label>What Should You Repeat Next Week?</label>
-          <textarea id="w_winsRepeat" class="short" placeholder="Don't let the wins disappear. What specifically should you bring into every call next week?"></textarea>
-        </div>
-      </div>
-    </div>
-
-    <!-- Demo Debrief -->
-    <div class="section">
-      <div class="section-header">
-        <span class="section-icon">🎯</span>
-        <span class="section-title">Demo Debrief</span>
-      </div>
-      <div class="section-body">
-        <div class="field">
-          <label>Calls That Booked — What Did They Have in Common?</label>
-          <textarea id="w_demoBooked" placeholder="Prospect situation, pain they mentioned, what you said, how you asked for the demo. Look for the pattern."></textarea>
-        </div>
-        <div class="field" style="margin-bottom:0">
-          <label>Calls That Didn't Book — What Did They Have in Common?</label>
-          <textarea id="w_demoMissed" placeholder="Where did those conversations go? Too early? Wrong prospect? Lost them on the ask? Be specific."></textarea>
-        </div>
-      </div>
-    </div>
-
-    <!-- Call Patterns -->
-    <div class="section">
-      <div class="section-header">
-        <span class="section-icon">🔍</span>
-        <span class="section-title">Call Pattern Analysis</span>
-      </div>
-      <div class="section-body">
-        <div class="field">
-          <label>Where Did Conversations Die This Week?</label>
-          <textarea id="w_convosDied" placeholder="Pull your call notes. Look for the moment things went sideways."></textarea>
-        </div>
-        <div class="field" style="margin-bottom:0">
-          <label>What Did Prospects Say Right Before You Lost Them?</label>
-          <textarea id="w_lostMoment" placeholder="Exact phrases, objections, tone shifts."></textarea>
-        </div>
-      </div>
-    </div>
-
-    <!-- Call Replay -->
-    <div class="section">
-      <div class="section-header">
-        <span class="section-icon">🎧</span>
-        <span class="section-title">Call Replay Notes</span>
-      </div>
-      <div class="section-body">
-        <div class="field">
-          <label>The "We're Good" Moment — What Did You Say After?</label>
-          <textarea id="w_weAreGood" placeholder="Listen to 2–3 calls. What happened right after they brushed you off?"></textarea>
-        </div>
-        <div class="field" style="margin-bottom:0">
-          <label>The Exact Reframe You'll Use Next Time</label>
-          <textarea id="w_couldHaveSaid" placeholder="Write it out word for word. Not 'I'll dig into their pain' — write the actual sentence you'll say the moment they brush you off."></textarea>
-        </div>
-      </div>
-    </div>
-
-    <!-- Objection Bank -->
-    <div class="section">
-      <div class="section-header">
-        <span class="section-icon">🛡️</span>
-        <span class="section-title">Objection Bank</span>
-        <div class="section-badge" id="objectionCount">0 entries</div>
-      </div>
-      <div class="section-body">
-        <div class="objection-form">
+        <div class="section-body">
+          <div id="weekOutcomeTotals"></div>
+          <div id="weekDailySummary"></div>
+          <div class="divider"></div>
+          <div>
+            <label style="margin-bottom:8px">Skill Rating Averages</label>
+            <div class="skill-agg" id="skillAggDisplay"></div>
+          </div>
+          <div class="divider"></div>
           <div class="field" style="margin-bottom:0">
-            <label>Objection</label>
-            <input type="text" id="newObjection" placeholder="What did they say?">
+            <label>Looking at this week's data — what's the pattern?</label>
+            <textarea id="w_synthesis" class="short" placeholder="Don't just describe what happened. What does it tell you about where you're at and what needs to change?"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <span class="section-icon">✅</span>
+          <span class="section-title">Accountability Check-in</span>
+        </div>
+        <div class="section-body">
+          <div id="lastWeekCommitment"></div>
+          <div class="field" style="margin-bottom:0">
+            <label>How Did It Actually Go?</label>
+            <textarea id="w_accountability" class="short" placeholder="Be honest. Did you do it on every call, or just when you remembered? What got in the way?"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <span class="section-icon">🏆</span>
+          <span class="section-title">What Worked This Week</span>
+        </div>
+        <div class="section-body">
+          <div class="field">
+            <label>Line or Approach That Got a Positive Reaction</label>
+            <textarea id="w_winsLine" class="short" placeholder="What exact thing did you say that landed? Write it out word for word if you can."></textarea>
           </div>
           <div class="field" style="margin-bottom:0">
-            <label>Your Best Current Response</label>
-            <textarea id="newResponse" class="short" placeholder="How you handle it now. Refine over time."></textarea>
+            <label>What Should You Repeat Next Week?</label>
+            <textarea id="w_winsRepeat" class="short" placeholder="Don't let the wins disappear. What specifically should you bring into every call next week?"></textarea>
           </div>
-          <button class="btn btn-primary btn-sm" style="align-self:flex-start" onclick="addObjection()">+ Add to Bank</button>
         </div>
-        <div class="obj-search">
-          <input type="text" id="objSearchInput" placeholder="Search objections..." oninput="renderObjectionBank()">
-        </div>
-        <div id="objectionBank"></div>
       </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="saveWeekly()">Save Review</button>
+        <span class="btn-hint">or Cmd+S</span>
+      </div>
+
     </div>
 
-    <!-- Next Week Focus -->
-    <div class="section">
-      <div class="section-header">
-        <span class="section-icon">⚡</span>
-        <span class="section-title">Skill Focus — Next Week</span>
-      </div>
-      <div class="section-body">
-        <div class="field">
-          <label>One Skill to Own Next Week</label>
-          <input type="text" id="w_nextSkill" placeholder="Not 'be better' — what exact behavior will you execute on every single call?">
+    <!-- ── Calls ── -->
+    <div id="sub-calls" class="sub-tab-content">
+
+      <div class="section">
+        <div class="section-header">
+          <span class="section-icon">🎯</span>
+          <span class="section-title">Demo Debrief</span>
         </div>
-        <div class="btn-row">
-          <button class="btn btn-primary" onclick="saveWeekly()">Save Weekly Review</button>
-          <span class="btn-hint">or Cmd+S</span>
+        <div class="section-body">
+          <div class="field">
+            <label>Calls That Booked — What Did They Have in Common?</label>
+            <textarea id="w_demoBooked" placeholder="Prospect situation, pain they mentioned, what you said, how you asked for the demo. Look for the pattern."></textarea>
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label>Calls That Didn't Book — What Did They Have in Common?</label>
+            <textarea id="w_demoMissed" placeholder="Where did those conversations go? Too early? Wrong prospect? Lost them on the ask? Be specific."></textarea>
+          </div>
         </div>
       </div>
+
+      <div class="section">
+        <div class="section-header">
+          <span class="section-icon">🔍</span>
+          <span class="section-title">Call Pattern Analysis</span>
+        </div>
+        <div class="section-body">
+          <div class="field">
+            <label>Where Did Conversations Die This Week?</label>
+            <textarea id="w_convosDied" placeholder="Pull your call notes. Look for the moment things went sideways."></textarea>
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label>What Did Prospects Say Right Before You Lost Them?</label>
+            <textarea id="w_lostMoment" placeholder="Exact phrases, objections, tone shifts."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <span class="section-icon">🎧</span>
+          <span class="section-title">Call Replay Notes</span>
+        </div>
+        <div class="section-body">
+          <div class="field">
+            <label>The "We're Good" Moment — What Did You Say After?</label>
+            <textarea id="w_weAreGood" placeholder="Listen to 2–3 calls. What happened right after they brushed you off?"></textarea>
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label>The Exact Reframe You'll Use Next Time</label>
+            <textarea id="w_couldHaveSaid" placeholder="Write it out word for word. Not 'I'll dig into their pain' — write the actual sentence you'll say the moment they brush you off."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="saveWeekly()">Save Calls</button>
+        <span class="btn-hint">or Cmd+S</span>
+      </div>
+
+    </div>
+
+    <!-- ── Plan ── -->
+    <div id="sub-plan" class="sub-tab-content">
+
+      <div class="section">
+        <div class="section-header">
+          <span class="section-icon">🛡️</span>
+          <span class="section-title">Objection Bank</span>
+          <div class="section-badge" id="objectionCount">0 entries</div>
+        </div>
+        <div class="section-body">
+          <div class="objection-form">
+            <div class="field" style="margin-bottom:0">
+              <label>Objection</label>
+              <input type="text" id="newObjection" placeholder="What did they say?">
+            </div>
+            <div class="field" style="margin-bottom:0">
+              <label>Your Best Current Response</label>
+              <textarea id="newResponse" class="short" placeholder="How you handle it now. Refine over time."></textarea>
+            </div>
+            <button class="btn btn-primary btn-sm" style="align-self:flex-start" onclick="addObjection()">+ Add to Bank</button>
+          </div>
+          <div class="obj-search">
+            <input type="text" id="objSearchInput" placeholder="Search objections..." oninput="renderObjectionBank()">
+          </div>
+          <div id="objectionBank"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <span class="section-icon">⚡</span>
+          <span class="section-title">Skill Focus — Next Week</span>
+        </div>
+        <div class="section-body">
+          <div class="field" style="margin-bottom:0">
+            <label>One Skill to Own Next Week</label>
+            <input type="text" id="w_nextSkill" placeholder="Not 'be better' — what exact behavior will you execute on every single call?">
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="saveWeekly()">Save Plan</button>
+        <span class="btn-hint">or Cmd+S</span>
+      </div>
+
     </div>
 
   </div>
@@ -1267,6 +1326,14 @@ function handleKeyDown(e) {
       saveMonthly();
     }
   }
+}
+
+// ── Sub-tab ──────────────────────────────────────────────
+function switchSubTab(name, btn) {
+  document.querySelectorAll('.sub-tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.sub-tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('sub-' + name).classList.add('active');
+  btn.classList.add('active');
 }
 
 // ── Tab ──────────────────────────────────────────────────
