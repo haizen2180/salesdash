@@ -1234,42 +1234,51 @@
       <button class="btn-icon" onclick="goCurrentMonth()">This Month</button>
     </div>
 
-    <!-- Month at a Glance -->
+    <!-- Overview: stats + skill focus + show rate -->
     <div class="section">
       <div class="section-header">
-        <span class="section-icon">🔹</span>
-        <span class="section-title">Month at a Glance</span>
+        <span class="section-icon">📊</span>
+        <span class="section-title">Overview</span>
+        <div class="section-badge">auto-pulled</div>
       </div>
       <div class="section-body">
         <div id="monthActivitySummary"></div>
         <div id="monthTrend"></div>
-      </div>
-    </div>
-
-    <!-- Skill Focus This Month -->
-    <div class="section">
-      <div class="section-header">
-        <span class="section-icon">🔹</span>
-        <span class="section-title">Skill Focus This Month</span>
-      </div>
-      <div class="section-body">
+        <div class="divider"></div>
+        <label style="margin-bottom:8px">Skill Focus</label>
         <div id="monthSkillRecap"></div>
+        <div class="divider"></div>
+        <div style="display:flex;align-items:flex-start;gap:16px">
+          <div style="flex:1">
+            <label>Demos Showed</label>
+            <input type="number" id="m_demosShowed" placeholder="0" oninput="calcConversion()">
+            <div class="char-hint" id="m_bookedHint"></div>
+            <input type="number" id="m_demosBooked" style="display:none" readonly>
+          </div>
+          <div id="conversionDisplay" style="display:none;background:var(--accent-dim);border:1px solid var(--accent);border-radius:var(--radius-sm);padding:10px 18px;text-align:center;flex-shrink:0">
+            <span class="conversion-rate" id="conversionRate" style="font-size:28px">—</span>
+            <div class="conversion-label">Show Rate</div>
+          </div>
+        </div>
+        <div class="field" style="margin-top:14px;margin-bottom:0">
+          <label>No-Show Notes</label>
+          <textarea id="m_demoNotes" class="short" placeholder="If show rate is low, why?"></textarea>
+        </div>
       </div>
     </div>
 
-    <!-- Objection Bank Review -->
+    <!-- Objection Bank -->
     <div class="section">
       <div class="section-header">
-        <span class="section-icon">🔹</span>
-        <span class="section-title">Objection Bank Review</span>
+        <span class="section-icon">🛡️</span>
+        <span class="section-title">Objection Bank</span>
       </div>
       <div class="section-body">
         <div class="field">
-          <label>Which Responses Still Feel Weak? What Are You Rewriting?</label>
-          <textarea id="m_weakResponses" placeholder="Go through the bank below. Which ones aren't landing? Write your rewrites here."></textarea>
+          <label>Weak Responses — What Are You Rewriting?</label>
+          <textarea id="m_weakResponses" class="short" placeholder="Which ones aren't landing? Write your rewrites here."></textarea>
         </div>
         <div class="divider"></div>
-        <label style="margin-bottom:10px">Live Objection Bank</label>
         <div class="obj-search">
           <input type="text" id="objSearchMonthly" placeholder="Search objections..." oninput="renderObjectionBank()">
         </div>
@@ -1277,59 +1286,31 @@
       </div>
     </div>
 
-    <!-- Demo Conversion -->
+    <!-- Content & Learning -->
     <div class="section">
       <div class="section-header">
-        <span class="section-icon">🔹</span>
-        <span class="section-title">Demo Conversion Rate</span>
-      </div>
-      <div class="section-body">
-        <div class="stats-row">
-          <div class="stat-input-group">
-            <label>Demos Booked <span style="font-weight:400;color:var(--text-muted)">(auto)</span></label>
-            <input type="number" id="m_demosBooked" placeholder="0" readonly style="opacity:0.6;cursor:default">
-          </div>
-          <div class="stat-input-group">
-            <label>Demos Showed</label>
-            <input type="number" id="m_demosShowed" placeholder="0" oninput="calcConversion()">
-          </div>
-        </div>
-        <div class="conversion-display" id="conversionDisplay" style="display:none">
-          <span class="conversion-rate" id="conversionRate">—</span>
-          <div class="conversion-label">Show Rate</div>
-        </div>
-        <div class="field" style="margin-top:14px;margin-bottom:0">
-          <label>Notes — Are No-Shows High? Why?</label>
-          <textarea id="m_demoNotes" class="short" placeholder="If show rate is low, are you pushing for the demo without enough buy-in?"></textarea>
-        </div>
-      </div>
-    </div>
-
-    <!-- Sales Content -->
-    <div class="section">
-      <div class="section-header">
-        <span class="section-icon">🔹</span>
-        <span class="section-title">Sales Content This Month</span>
+        <span class="section-icon">📚</span>
+        <span class="section-title">Content & Learning</span>
       </div>
       <div class="section-body">
         <div class="field">
           <label>What You Read / Watched / Listened To</label>
           <input type="text" id="m_contentTitle" placeholder="Title, chapter, podcast episode...">
         </div>
-        <div class="field">
+        <div class="field" style="margin-bottom:0">
           <label>One Thing to Add to Your Process</label>
-          <textarea id="m_contentTakeaway" class="short" placeholder="Just one thing. Don't try to change everything."></textarea>
+          <textarea id="m_contentTakeaway" class="short" placeholder="Just one thing."></textarea>
         </div>
         <div class="btn-row" style="margin-top:12px;margin-bottom:0">
           <button class="btn btn-secondary btn-sm" onclick="addContentEntry()">+ Log Entry</button>
         </div>
         <div id="m_contentLog"></div>
-        <div class="divider"></div>
-        <div class="btn-row" style="margin-top:0">
-          <button class="btn btn-primary" onclick="saveMonthly()">Save Monthly Review</button>
-          <span class="btn-hint">or Cmd+S</span>
-        </div>
       </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="saveMonthly()">Save Monthly Review</button>
+      <span class="btn-hint">or Cmd+S</span>
     </div>
 
   </div>
@@ -2023,6 +2004,7 @@ function renderMonthSummary() {
 
   // Auto-populate readonly Demos Booked from daily data
   document.getElementById('m_demosBooked').value = stats.demos || '';
+  document.getElementById('m_bookedHint').textContent = stats.demos > 0 ? `${stats.demos} booked this month` : '';
   calcConversion();
 
   // Activity totals
