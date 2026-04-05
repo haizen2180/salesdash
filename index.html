@@ -797,6 +797,41 @@
       color: var(--text-muted);
     }
 
+    /* ── Month trend & skill recap ── */
+    .month-trend-row { display: flex; flex-direction: column; gap: 0; margin-top: 4px; }
+
+    .month-trend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .month-trend-item:last-child { border-bottom: none; }
+
+    .trend-label {
+      flex: 1;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .trend-curr { font-size: 20px; font-weight: 800; color: var(--text); min-width: 36px; text-align: right; }
+    .trend-delta { font-size: 11px; font-weight: 700; min-width: 36px; text-align: center; }
+    .trend-prev { font-size: 11px; color: var(--text-muted); }
+
+    .month-skill-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .month-skill-item:last-child { border-bottom: none; }
+    .month-skill-week { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; min-width: 100px; }
+    .month-skill-name { font-size: 13px; font-weight: 600; color: var(--accent); }
+
     /* ── Outcome pills in log ── */
     .log-outcomes { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
 
@@ -1199,6 +1234,29 @@
       <button class="btn-icon" onclick="goCurrentMonth()">This Month</button>
     </div>
 
+    <!-- Month at a Glance -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">🔹</span>
+        <span class="section-title">Month at a Glance</span>
+      </div>
+      <div class="section-body">
+        <div id="monthActivitySummary"></div>
+        <div id="monthTrend"></div>
+      </div>
+    </div>
+
+    <!-- Skill Focus This Month -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">🔹</span>
+        <span class="section-title">Skill Focus This Month</span>
+      </div>
+      <div class="section-body">
+        <div id="monthSkillRecap"></div>
+      </div>
+    </div>
+
     <!-- Objection Bank Review -->
     <div class="section">
       <div class="section-header">
@@ -1228,8 +1286,8 @@
       <div class="section-body">
         <div class="stats-row">
           <div class="stat-input-group">
-            <label>Demos Booked</label>
-            <input type="number" id="m_demosBooked" placeholder="0" oninput="calcConversion()">
+            <label>Demos Booked <span style="font-weight:400;color:var(--text-muted)">(auto)</span></label>
+            <input type="number" id="m_demosBooked" placeholder="0" readonly style="opacity:0.6;cursor:default">
           </div>
           <div class="stat-input-group">
             <label>Demos Showed</label>
@@ -1243,9 +1301,6 @@
         <div class="field" style="margin-top:14px;margin-bottom:0">
           <label>Notes — Are No-Shows High? Why?</label>
           <textarea id="m_demoNotes" class="short" placeholder="If show rate is low, are you pushing for the demo without enough buy-in?"></textarea>
-        </div>
-        <div class="btn-row">
-          <button class="btn btn-primary" onclick="saveDemoStats()">Save Stats</button>
         </div>
       </div>
     </div>
@@ -1265,7 +1320,12 @@
           <label>One Thing to Add to Your Process</label>
           <textarea id="m_contentTakeaway" class="short" placeholder="Just one thing. Don't try to change everything."></textarea>
         </div>
-        <div class="btn-row">
+        <div class="btn-row" style="margin-top:12px;margin-bottom:0">
+          <button class="btn btn-secondary btn-sm" onclick="addContentEntry()">+ Log Entry</button>
+        </div>
+        <div id="m_contentLog"></div>
+        <div class="divider"></div>
+        <div class="btn-row" style="margin-top:0">
           <button class="btn btn-primary" onclick="saveMonthly()">Save Monthly Review</button>
           <span class="btn-hint">or Cmd+S</span>
         </div>
@@ -1344,7 +1404,7 @@ function switchTab(tab, btn) {
   btn.classList.add('active');
   activeTab = tab;
   if (tab === 'weekly') { loadWeeklyEntry(); renderObjectionBank(); }
-  if (tab === 'monthly') { renderObjectionBank(); }
+  if (tab === 'monthly') { loadMonthlyEntry(); renderObjectionBank(); }
 }
 
 // ── Helpers ──────────────────────────────────────────────
@@ -1802,18 +1862,21 @@ function saveWeekly() {
 // ── Monthly ──────────────────────────────────────────────
 function getMonthKey(offset) {
   const d = new Date();
+  d.setDate(1);
   d.setMonth(d.getMonth() + offset);
   return 'month_' + d.toISOString().split('T')[0].slice(0, 7);
 }
 
 function getMonthLabel(offset) {
   const d = new Date();
+  d.setDate(1);
   d.setMonth(d.getMonth() + offset);
   return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }).toUpperCase();
 }
 
 function initMonthly() {
   document.getElementById('monthLabel').textContent = getMonthLabel(0);
+  loadMonthlyEntry();
 }
 
 function shiftMonth(delta) {
@@ -1832,12 +1895,10 @@ function loadMonthlyEntry() {
   const key = getMonthKey(currentMonthOffset);
   const data = JSON.parse(localStorage.getItem(key) || '{}');
   document.getElementById('m_weakResponses').value = data.weakResponses || '';
-  document.getElementById('m_demosBooked').value = data.demosBooked || '';
   document.getElementById('m_demosShowed').value = data.demosShowed || '';
   document.getElementById('m_demoNotes').value = data.demoNotes || '';
-  document.getElementById('m_contentTitle').value = data.contentTitle || '';
-  document.getElementById('m_contentTakeaway').value = data.contentTakeaway || '';
-  calcConversion();
+  renderContentLog(data.contentLog || []);
+  renderMonthSummary(); // populates m_demosBooked and calls calcConversion
 }
 
 function calcConversion() {
@@ -1859,24 +1920,162 @@ function calcConversion() {
   }
 }
 
-function saveDemoStats() {
-  const key = getMonthKey(currentMonthOffset);
-  const data = JSON.parse(localStorage.getItem(key) || '{}');
-  data.demosBooked = document.getElementById('m_demosBooked').value.trim();
-  data.demosShowed = document.getElementById('m_demosShowed').value.trim();
-  data.demoNotes = document.getElementById('m_demoNotes').value.trim();
-  localStorage.setItem(key, JSON.stringify(data));
-  showToast('Demo stats saved');
-}
-
 function saveMonthly() {
   const key = getMonthKey(currentMonthOffset);
   const data = JSON.parse(localStorage.getItem(key) || '{}');
   data.weakResponses = document.getElementById('m_weakResponses').value.trim();
-  data.contentTitle = document.getElementById('m_contentTitle').value.trim();
-  data.contentTakeaway = document.getElementById('m_contentTakeaway').value.trim();
+  data.demosShowed   = document.getElementById('m_demosShowed').value.trim();
+  data.demoNotes     = document.getElementById('m_demoNotes').value.trim();
   localStorage.setItem(key, JSON.stringify(data));
   showToast('Monthly review saved');
+}
+
+function addContentEntry() {
+  const title    = document.getElementById('m_contentTitle').value.trim();
+  const takeaway = document.getElementById('m_contentTakeaway').value.trim();
+  if (!title) { showToast('Add a title first'); return; }
+  const key  = getMonthKey(currentMonthOffset);
+  const data = JSON.parse(localStorage.getItem(key) || '{}');
+  const log  = data.contentLog || [];
+  log.unshift({ title, takeaway, date: todayStr() });
+  data.contentLog = log;
+  localStorage.setItem(key, JSON.stringify(data));
+  document.getElementById('m_contentTitle').value    = '';
+  document.getElementById('m_contentTakeaway').value = '';
+  renderContentLog(log);
+  showToast('Entry logged');
+}
+
+function deleteContentEntry(index) {
+  const key  = getMonthKey(currentMonthOffset);
+  const data = JSON.parse(localStorage.getItem(key) || '{}');
+  const log  = data.contentLog || [];
+  log.splice(index, 1);
+  data.contentLog = log;
+  localStorage.setItem(key, JSON.stringify(data));
+  renderContentLog(log);
+  showToast('Entry removed');
+}
+
+function renderContentLog(entries) {
+  const el = document.getElementById('m_contentLog');
+  if (!entries.length) {
+    el.innerHTML = '<div class="empty-state" style="font-size:12px;margin-top:8px">No entries logged this month.</div>';
+    return;
+  }
+  el.innerHTML = entries.map((e, i) => `
+    <div class="log-item" style="margin-bottom:6px">
+      <div class="log-item-content">
+        <div class="log-item-row"><strong>${e.title}</strong></div>
+        ${e.takeaway ? `<div class="log-item-row" style="color:var(--text-muted);font-size:12px">${e.takeaway}</div>` : ''}
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">${e.date || ''}</div>
+      </div>
+      <button class="log-delete" onclick="deleteContentEntry(${i})" title="Remove">&#215;</button>
+    </div>`).join('');
+}
+
+function getMonthDays(offset) {
+  const d = new Date();
+  d.setDate(1);
+  d.setMonth(d.getMonth() + offset);
+  const year = d.getFullYear(), month = d.getMonth();
+  const days = [], cur = new Date(year, month, 1);
+  while (cur.getMonth() === month) {
+    days.push(cur.toISOString().split('T')[0]);
+    cur.setDate(cur.getDate() + 1);
+  }
+  return days;
+}
+
+// Single pass over month days — returns activity stats + week keys for skill focus
+function getMonthData(offset) {
+  const stats = { connects: 0, demos: 0, callbacks: 0 };
+  const weekKeys = new Set();
+  getMonthDays(offset).forEach(ds => {
+    const e = getDaily(ds);
+    stats.connects  += parseInt(e.connects)     || 0;
+    stats.demos     += parseInt(e.outcomeDemos) || 0;
+    stats.callbacks += parseInt(e.callbacks)    || 0;
+    const d  = new Date(ds + 'T12:00:00');
+    const ws = new Date(d);
+    ws.setDate(d.getDate() - d.getDay());
+    weekKeys.add('week_' + ws.toISOString().split('T')[0]);
+  });
+  return { stats, weekKeys };
+}
+
+function getSkillFocusFromKeys(weekKeys) {
+  return [...weekKeys].sort().reduce((arr, key) => {
+    const data = JSON.parse(localStorage.getItem(key) || '{}');
+    if (data.nextSkill) {
+      const ws = new Date(key.replace('week_', '') + 'T12:00:00');
+      const we = new Date(ws); we.setDate(ws.getDate() + 6);
+      const fmt = dt => dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      arr.push({ range: `${fmt(ws)}–${fmt(we)}`, skill: data.nextSkill });
+    }
+    return arr;
+  }, []);
+}
+
+function renderMonthSummary() {
+  const { stats, weekKeys } = getMonthData(currentMonthOffset);
+  const { stats: last }     = getMonthData(currentMonthOffset - 1);
+
+  // Auto-populate readonly Demos Booked from daily data
+  document.getElementById('m_demosBooked').value = stats.demos || '';
+  calcConversion();
+
+  // Activity totals
+  const summaryEl = document.getElementById('monthActivitySummary');
+  if (!stats.connects && !stats.demos && !stats.callbacks) {
+    summaryEl.innerHTML = '<div class="empty-state">No daily entries found for this month.</div>';
+  } else {
+    const rate = stats.connects > 0 ? ((stats.demos / stats.connects) * 100).toFixed(0) + '%' : null;
+    summaryEl.innerHTML = `<div class="week-totals-row">
+      <div class="week-total"><span class="week-total-num">${stats.connects}</span><span class="week-total-label">Connects</span></div>
+      <div class="week-total"><span class="week-total-num" style="color:var(--green)">${stats.demos}</span><span class="week-total-label">Demos Booked</span></div>
+      <div class="week-total"><span class="week-total-num" style="color:var(--amber)">${stats.callbacks}</span><span class="week-total-label">Callbacks</span></div>
+      ${rate ? `<div class="week-total"><span class="week-total-num" style="color:var(--accent)">${rate}</span><span class="week-total-label">Connect → Demo</span></div>` : ''}
+    </div>`;
+  }
+
+  // Month-over-month trend
+  const trendEl = document.getElementById('monthTrend');
+  if (!last.connects && !last.demos && !last.callbacks) {
+    trendEl.innerHTML = '';
+  } else {
+    const row = (label, curr, prev) => {
+      const delta = curr - prev;
+      const sign = delta > 0 ? '+' : '';
+      const color = delta > 0 ? 'var(--green)' : delta < 0 ? 'var(--red)' : 'var(--text-muted)';
+      const arrow = delta > 0 ? '▲' : delta < 0 ? '▼' : '—';
+      return `<div class="month-trend-item">
+        <span class="trend-label">${label}</span>
+        <span class="trend-curr">${curr}</span>
+        <span class="trend-delta" style="color:${color}">${arrow} ${delta !== 0 ? sign + Math.abs(delta) : ''}</span>
+        <span class="trend-prev">${prev} last mo</span>
+      </div>`;
+    };
+    trendEl.innerHTML = `<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin:14px 0 4px">vs Last Month</div>
+      <div class="month-trend-row">
+        ${row('Connects', stats.connects, last.connects)}
+        ${row('Demos Booked', stats.demos, last.demos)}
+        ${row('Callbacks', stats.callbacks, last.callbacks)}
+      </div>`;
+  }
+
+  // Skill focus recap — reuses weekKeys already computed above (no extra pass)
+  const skillEl = document.getElementById('monthSkillRecap');
+  const skills = getSkillFocusFromKeys(weekKeys);
+  if (!skills.length) {
+    skillEl.innerHTML = '<div class="empty-state" style="font-size:12px">No weekly skill commitments found for this month.</div>';
+  } else {
+    skillEl.innerHTML = skills.map(s => `
+      <div class="month-skill-item">
+        <span class="month-skill-week">${s.range}</span>
+        <span class="month-skill-name">${s.skill}</span>
+      </div>`).join('');
+  }
 }
 
 // ── Objection Bank ───────────────────────────────────────
