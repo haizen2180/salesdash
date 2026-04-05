@@ -3,89 +3,119 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sales Dashboard</title>
+  <title>SalesDash</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #f5f5f0;
-      --surface: #ffffff;
-      --surface-alt: #f9f9f6;
-      --border: #e4e4de;
-      --text: #1a1a1a;
-      --text-muted: #6b6b63;
-      --accent: #2563eb;
-      --accent-light: #eff6ff;
-      --accent-border: #bfdbfe;
-      --green: #16a34a;
-      --green-light: #f0fdf4;
-      --yellow: #ca8a04;
-      --yellow-light: #fefce8;
-      --red: #dc2626;
-      --red-light: #fef2f2;
-      --radius: 10px;
-      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
-      --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+      --bg:           #060606;
+      --surface:      #0e0e0e;
+      --surface-alt:  #131313;
+      --surface-hi:   #1a1200;
+      --border:       #1e1200;
+      --border-mid:   #3d2600;
+      --border-hi:    #ff6600;
+      --text:         #e07830;
+      --text-bright:  #ff9040;
+      --text-muted:   #6b3a18;
+      --accent:       #ff6600;
+      --accent-glow:  rgba(255,102,0,0.35);
+      --accent-dim:   rgba(255,102,0,0.08);
+      --amber:        #ffaa00;
+      --amber-dim:    rgba(255,170,0,0.08);
+      --red:          #ff2a00;
+      --red-dim:      rgba(255,42,0,0.08);
+      --green:        #00e87a;
+      --green-dim:    rgba(0,232,122,0.07);
+      --radius:       0px;
+      --font:         'Courier New', 'Lucida Console', monospace;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: var(--font);
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      font-size: 14px;
+      font-size: 13px;
       line-height: 1.5;
+    }
+
+    /* scanlines */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0,0,0,0.18) 3px,
+        rgba(0,0,0,0.18) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
     }
 
     /* ── Header ── */
     header {
       background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 0 32px;
+      border-bottom: 1px solid var(--border-mid);
+      padding: 0 28px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 56px;
+      height: 52px;
       position: sticky;
       top: 0;
       z-index: 100;
+      box-shadow: 0 0 20px rgba(255,102,0,0.08);
     }
 
     .logo {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 700;
-      letter-spacing: -0.3px;
-      color: var(--text);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-shadow: 0 0 12px var(--accent-glow), 0 0 30px rgba(255,102,0,0.2);
     }
 
-    .logo span { color: var(--accent); }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-    .date-display {
-      font-size: 13px;
+    .header-date {
+      font-size: 11px;
       color: var(--text-muted);
-      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
     }
+
+    .header-actions { display: flex; gap: 8px; }
 
     /* ── Tabs ── */
     .tab-nav {
       background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 0 32px;
+      border-bottom: 1px solid var(--border-mid);
+      padding: 0 28px;
       display: flex;
-      gap: 0;
     }
 
     .tab-btn {
-      padding: 14px 20px;
-      font-size: 13px;
-      font-weight: 600;
+      padding: 13px 18px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: var(--font);
+      letter-spacing: 2px;
+      text-transform: uppercase;
       color: var(--text-muted);
       background: none;
       border: none;
       border-bottom: 2px solid transparent;
       cursor: pointer;
       transition: all 0.15s;
-      letter-spacing: 0.1px;
     }
 
     .tab-btn:hover { color: var(--text); }
@@ -93,6 +123,7 @@
     .tab-btn.active {
       color: var(--accent);
       border-bottom-color: var(--accent);
+      text-shadow: 0 0 10px var(--accent-glow);
     }
 
     /* ── Layout ── */
@@ -100,234 +131,356 @@
     .tab-content.active { display: block; }
 
     .page {
-      max-width: 800px;
+      max-width: 780px;
       margin: 0 auto;
-      padding: 32px 24px;
+      padding: 28px 20px;
     }
 
     /* ── Section ── */
     .section {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      margin-bottom: 20px;
+      border: 1px solid var(--border-mid);
+      margin-bottom: 18px;
       overflow: hidden;
-      box-shadow: var(--shadow);
+      transition: border-color 0.2s;
     }
 
+    .section:hover { border-color: #4a2e00; }
+
     .section-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border-mid);
       display: flex;
       align-items: center;
       gap: 10px;
       background: var(--surface-alt);
     }
 
-    .section-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 7px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      flex-shrink: 0;
-    }
-
-    .icon-blue { background: var(--accent-light); }
-    .icon-green { background: var(--green-light); }
-    .icon-yellow { background: var(--yellow-light); }
-    .icon-red { background: var(--red-light); }
+    .section-icon { font-size: 14px; }
 
     .section-title {
-      font-size: 13px;
+      font-size: 10px;
       font-weight: 700;
-      letter-spacing: 0.3px;
+      letter-spacing: 2.5px;
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: var(--accent);
+      text-shadow: 0 0 8px var(--accent-glow);
     }
 
     .section-badge {
       margin-left: auto;
-      font-size: 11px;
-      font-weight: 600;
+      font-size: 10px;
+      font-weight: 700;
       padding: 2px 8px;
-      border-radius: 20px;
-      background: var(--accent-light);
-      color: var(--accent);
+      border: 1px solid var(--border-mid);
+      color: var(--text-muted);
+      letter-spacing: 1px;
     }
 
-    .section-body { padding: 20px; }
+    .section-body { padding: 18px; }
 
     /* ── Fields ── */
-    .field { margin-bottom: 18px; }
+    .field { margin-bottom: 16px; }
     .field:last-child { margin-bottom: 0; }
 
     label {
       display: block;
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 10px;
+      font-weight: 700;
       color: var(--text-muted);
       margin-bottom: 6px;
       text-transform: uppercase;
-      letter-spacing: 0.4px;
+      letter-spacing: 1.5px;
     }
 
     input[type="text"],
+    input[type="number"],
+    input[type="file"],
     textarea,
     select {
       width: 100%;
-      padding: 9px 12px;
+      padding: 8px 11px;
       background: var(--surface-alt);
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      font-size: 14px;
-      color: var(--text);
-      font-family: inherit;
+      border: 1px solid var(--border-mid);
+      font-size: 13px;
+      color: var(--text-bright);
+      font-family: var(--font);
       transition: border-color 0.15s, box-shadow 0.15s;
       resize: vertical;
+      outline: none;
     }
 
     input[type="text"]:focus,
-    textarea:focus,
-    select:focus {
-      outline: none;
+    input[type="number"]:focus,
+    textarea:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
-      background: var(--surface);
+      box-shadow: 0 0 0 1px var(--accent), 0 0 14px rgba(255,102,0,0.2);
+      background: var(--surface-hi);
     }
 
-    textarea { min-height: 80px; }
-    textarea.short { min-height: 56px; }
+    textarea { min-height: 76px; }
+    textarea.short { min-height: 54px; }
 
     .char-hint {
-      font-size: 11px;
+      font-size: 10px;
       color: var(--text-muted);
       margin-top: 4px;
+      letter-spacing: 0.5px;
     }
 
-    /* ── Rating Buttons ── */
-    .rating-group {
-      display: flex;
-      gap: 10px;
-    }
-
-    .rating-btn {
-      flex: 1;
-      padding: 12px;
-      border: 2px solid var(--border);
-      border-radius: 8px;
-      background: var(--surface-alt);
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.15s;
-      font-family: inherit;
-    }
-
-    .rating-btn:hover { border-color: var(--accent); background: var(--accent-light); }
-
-    .rating-btn.selected-1 { border-color: var(--red); background: var(--red-light); }
-    .rating-btn.selected-2 { border-color: var(--yellow); background: var(--yellow-light); }
-    .rating-btn.selected-3 { border-color: var(--green); background: var(--green-light); }
-
-    .rating-num {
-      font-size: 20px;
-      font-weight: 700;
-      display: block;
-    }
-
-    .rating-btn:nth-child(1) .rating-num { color: var(--red); }
-    .rating-btn:nth-child(2) .rating-num { color: var(--yellow); }
-    .rating-btn:nth-child(3) .rating-num { color: var(--green); }
-
-    .rating-label {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-muted);
-      display: block;
-      margin-top: 2px;
-    }
-
-    /* ── Save Button ── */
-    .btn-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 24px;
-    }
-
+    /* ── Buttons ── */
     .btn {
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
+      padding: 9px 18px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: var(--font);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
       cursor: pointer;
-      border: none;
-      font-family: inherit;
+      border: 1px solid;
       transition: all 0.15s;
     }
 
     .btn-primary {
-      background: var(--accent);
-      color: white;
+      background: transparent;
+      border-color: var(--accent);
+      color: var(--accent);
     }
 
-    .btn-primary:hover { background: #1d4ed8; }
+    .btn-primary:hover {
+      background: var(--accent);
+      color: #000;
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
 
     .btn-secondary {
-      background: var(--surface-alt);
+      background: transparent;
+      border-color: var(--border-mid);
       color: var(--text-muted);
-      border: 1px solid var(--border);
     }
 
-    .btn-secondary:hover { color: var(--text); border-color: #ccc; }
+    .btn-secondary:hover { border-color: var(--text-muted); color: var(--text); }
 
     .btn-danger {
-      background: var(--red-light);
+      background: transparent;
+      border-color: var(--red);
       color: var(--red);
-      border: 1px solid #fecaca;
     }
 
-    .btn-danger:hover { background: #fee2e2; }
+    .btn-danger:hover { background: var(--red-dim); }
 
-    .btn-sm {
-      padding: 6px 12px;
-      font-size: 12px;
+    .btn-sm { padding: 5px 10px; font-size: 10px; }
+
+    .btn-icon {
+      padding: 7px 10px;
+      font-size: 13px;
+      background: transparent;
+      border: 1px solid var(--border-mid);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.15s;
+    }
+
+    .btn-icon:hover { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      align-items: center;
+    }
+
+    .btn-hint {
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
     }
 
     /* ── Toast ── */
     .toast {
       position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: #1a1a1a;
-      color: white;
-      padding: 12px 18px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 500;
+      bottom: 22px;
+      right: 22px;
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 10px 16px;
+      font-size: 11px;
+      font-family: var(--font);
+      letter-spacing: 1px;
+      text-transform: uppercase;
       opacity: 0;
       transform: translateY(8px);
       transition: all 0.2s;
-      z-index: 999;
+      z-index: 9998;
       pointer-events: none;
+      box-shadow: 0 0 20px var(--accent-glow);
     }
 
     .toast.show { opacity: 1; transform: translateY(0); }
 
-    /* ── Pattern Tracker Log ── */
-    .log-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 12px;
+    /* ── Rating ── */
+    .rating-group { display: flex; gap: 10px; }
+
+    .rating-btn {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid var(--border-mid);
+      background: var(--surface-alt);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+      font-family: var(--font);
     }
+
+    .rating-btn:hover { border-color: var(--accent); }
+
+    .rating-btn.sel-1 { border-color: var(--red); background: var(--red-dim); box-shadow: 0 0 10px rgba(255,42,0,0.2); }
+    .rating-btn.sel-2 { border-color: var(--amber); background: var(--amber-dim); box-shadow: 0 0 10px rgba(255,170,0,0.2); }
+    .rating-btn.sel-3 { border-color: var(--green); background: var(--green-dim); box-shadow: 0 0 12px rgba(0,232,122,0.2); }
+
+    .rating-num {
+      font-size: 22px;
+      font-weight: 700;
+      display: block;
+    }
+
+    .rating-btn:nth-child(1) .rating-num { color: var(--red); }
+    .rating-btn:nth-child(2) .rating-num { color: var(--amber); }
+    .rating-btn:nth-child(3) .rating-num { color: var(--green); }
+
+    .rating-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: block;
+      margin-top: 3px;
+    }
+
+    /* ── Date Nav ── */
+    .date-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .date-nav input[type="date"] {
+      flex: 1;
+      padding: 7px 10px;
+      background: var(--surface);
+      border: 1px solid var(--border-mid);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      font-family: var(--font);
+      letter-spacing: 1px;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .date-nav input[type="date"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    /* week strip */
+    .week-strip {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+      justify-content: center;
+    }
+
+    .week-day {
+      flex: 1;
+      text-align: center;
+      padding: 6px 4px;
+      border: 1px solid var(--border-mid);
+      background: var(--surface);
+    }
+
+    .week-day-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .week-day-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      margin: 5px auto 0;
+      background: var(--border-mid);
+    }
+
+    .week-day.has-entry .week-day-dot {
+      background: var(--accent);
+      box-shadow: 0 0 6px var(--accent-glow);
+    }
+
+    .week-day.is-today {
+      border-color: var(--accent);
+    }
+
+    .week-day.is-today .week-day-label {
+      color: var(--accent);
+    }
+
+    /* ── Skill Chips ── */
+    .skill-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .skill-chip {
+      padding: 4px 10px;
+      border: 1px solid var(--border-mid);
+      background: var(--surface-alt);
+      font-size: 11px;
+      font-family: var(--font);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .skill-chip:hover { border-color: var(--accent); color: var(--accent); }
+
+    .skill-chip.active {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+      color: var(--accent);
+      text-shadow: 0 0 8px var(--accent-glow);
+    }
+
+    .skill-chip.custom-chip {
+      border-style: dashed;
+    }
+
+    .skill-chip-del {
+      margin-left: 5px;
+      opacity: 0.5;
+      font-size: 12px;
+    }
+
+    .skill-chip-del:hover { opacity: 1; color: var(--red); }
+
+    /* ── Pattern Log ── */
+    .log-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
 
     .log-item {
       background: var(--surface-alt);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 14px;
+      border: 1px solid var(--border-mid);
+      padding: 11px 13px;
       display: flex;
       align-items: flex-start;
       gap: 12px;
@@ -335,35 +488,38 @@
 
     .log-item-meta {
       flex-shrink: 0;
-      font-size: 11px;
+      font-size: 10px;
       color: var(--text-muted);
-      font-weight: 600;
-      min-width: 70px;
+      font-weight: 700;
+      min-width: 64px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
 
     .log-item-content { flex: 1; }
 
     .log-item-row {
-      font-size: 13px;
+      font-size: 12px;
       color: var(--text);
       margin-bottom: 4px;
+      line-height: 1.4;
     }
 
     .log-item-row:last-child { margin-bottom: 0; }
 
     .log-item-row span {
-      font-weight: 600;
-      font-size: 11px;
+      font-size: 9px;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.3px;
+      letter-spacing: 1px;
       margin-right: 6px;
     }
 
     .tag-worked { color: var(--green); }
     .tag-changed { color: var(--accent); }
-    .tag-rating-1 { color: var(--red); }
-    .tag-rating-2 { color: var(--yellow); }
-    .tag-rating-3 { color: var(--green); }
+    .tag-r1 { color: var(--red); }
+    .tag-r2 { color: var(--amber); }
+    .tag-r3 { color: var(--green); }
 
     .log-delete {
       flex-shrink: 0;
@@ -374,7 +530,7 @@
       font-size: 16px;
       padding: 0;
       line-height: 1;
-      opacity: 0.4;
+      opacity: 0.3;
       transition: opacity 0.15s;
     }
 
@@ -382,39 +538,67 @@
 
     .empty-state {
       text-align: center;
-      padding: 24px;
+      padding: 22px;
       color: var(--text-muted);
-      font-size: 13px;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border: 1px dashed var(--border-mid);
     }
 
     /* ── Objection Bank ── */
+    .obj-search {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .obj-search input {
+      flex: 1;
+      padding: 7px 10px;
+      background: var(--surface-alt);
+      border: 1px solid var(--border-mid);
+      font-size: 12px;
+      color: var(--text-bright);
+      font-family: var(--font);
+      outline: none;
+    }
+
+    .obj-search input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+
     .objection-form {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-bottom: 16px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--border);
+      gap: 9px;
+      margin-bottom: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-mid);
     }
 
     .objection-item {
       background: var(--surface-alt);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 14px;
-      margin-bottom: 10px;
+      border: 1px solid var(--border-mid);
+      padding: 13px;
+      margin-bottom: 8px;
+      transition: border-color 0.15s;
     }
 
+    .objection-item:hover { border-color: #4a2e00; }
     .objection-item:last-child { margin-bottom: 0; }
 
     .objection-q {
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-bright);
       margin-bottom: 6px;
+      line-height: 1.4;
     }
 
     .objection-a {
-      font-size: 13px;
+      font-size: 12px;
       color: var(--text-muted);
       line-height: 1.5;
     }
@@ -424,16 +608,18 @@
       align-items: center;
       justify-content: space-between;
       margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-mid);
     }
 
     .objection-date {
-      font-size: 11px;
+      font-size: 10px;
       color: var(--text-muted);
+      letter-spacing: 0.5px;
     }
 
     .objection-actions { display: flex; gap: 6px; }
 
-    /* edit mode */
     .objection-edit-form {
       display: none;
       flex-direction: column;
@@ -444,202 +630,163 @@
     .objection-item.editing .objection-edit-form { display: flex; }
     .objection-item.editing .objection-view { display: none; }
 
-    /* ── Weekly / Monthly prose sections ── */
-    .prose-field { margin-bottom: 16px; }
-    .prose-field:last-child { margin-bottom: 0; }
+    /* ── Week Nav ── */
+    .period-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
 
-    .prose-label {
+    .period-label {
+      flex: 1;
+      text-align: center;
       font-size: 12px;
       font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      margin-bottom: 6px;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border-mid);
+      padding: 7px 12px;
+      letter-spacing: 1px;
     }
 
-    /* ── Demo Stats ── */
-    .stats-row {
-      display: flex;
-      gap: 12px;
-    }
-
-    .stat-input-group {
-      flex: 1;
-    }
+    /* ── Stats ── */
+    .stats-row { display: flex; gap: 12px; }
+    .stat-input-group { flex: 1; }
 
     .conversion-display {
-      background: var(--accent-light);
-      border: 1px solid var(--accent-border);
-      border-radius: 8px;
-      padding: 12px;
+      border: 1px solid var(--accent);
+      padding: 14px;
       text-align: center;
       margin-top: 12px;
+      box-shadow: 0 0 20px var(--accent-glow), inset 0 0 20px rgba(255,102,0,0.04);
     }
 
     .conversion-rate {
-      font-size: 28px;
-      font-weight: 800;
+      font-size: 36px;
+      font-weight: 700;
       color: var(--accent);
+      text-shadow: 0 0 20px var(--accent-glow);
+      display: block;
     }
 
     .conversion-label {
-      font-size: 11px;
-      font-weight: 600;
+      font-size: 10px;
+      font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.4px;
+      letter-spacing: 2px;
       margin-top: 2px;
     }
 
-    /* ── Date nav ── */
-    .date-nav {
+    /* ── Weekly summary ── */
+    .week-summary {
       display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-
-    .date-nav-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 7px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      cursor: pointer;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-muted);
-      transition: all 0.15s;
-    }
-
-    .date-nav-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-    .date-nav input[type="date"] {
-      width: auto;
-      flex: 1;
-      padding: 7px 12px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-      font-family: inherit;
-      cursor: pointer;
-    }
-
-    .date-nav input[type="date"]:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
-    }
-
-    .today-btn {
-      padding: 7px 12px;
-      border-radius: 7px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
-      font-family: inherit;
-      transition: all 0.15s;
-    }
-
-    .today-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-    /* ── Skill chips ── */
-    .skill-chips {
-      display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
       gap: 6px;
-      margin-bottom: 8px;
     }
 
-    .skill-chip {
-      padding: 5px 10px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      background: var(--surface-alt);
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .skill-chip:hover { border-color: var(--accent); color: var(--accent); }
-    .skill-chip.active { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 600; }
-
-    /* ── Week nav ── */
-    .week-nav {
+    .week-summary-row {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 24px;
+      padding: 8px 10px;
+      background: var(--surface-alt);
+      border: 1px solid var(--border-mid);
+      font-size: 11px;
     }
 
-    .week-label {
+    .wsr-date {
+      font-weight: 700;
+      color: var(--text-muted);
+      min-width: 50px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .wsr-skill {
       flex: 1;
-      text-align: center;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      padding: 7px 12px;
+      color: var(--accent);
+    }
+
+    .wsr-worked { flex: 2; color: var(--text); }
+
+    .skill-agg { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+
+    .skill-agg-item {
+      padding: 5px 10px;
+      border: 1px solid var(--border-mid);
+      font-size: 10px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .agg-name { color: var(--text-muted); }
+    .agg-avg { color: var(--accent); font-weight: 700; margin-left: 6px; }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: var(--border-mid);
+      margin: 16px 0;
+    }
+
+    /* ── File input ── */
+    input[type="file"] {
+      display: none;
     }
   </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">Sales<span>Dash</span></div>
-  <div class="date-display" id="headerDate"></div>
+  <div class="logo">SalesDash</div>
+  <div class="header-right">
+    <div class="header-date" id="headerDate"></div>
+    <div class="header-actions">
+      <button class="btn-icon" onclick="exportData()" title="Export backup">&#8595; Export</button>
+      <label class="btn-icon" style="cursor:pointer" title="Import backup">
+        &#8593; Import
+        <input type="file" id="importFile" accept=".json" onchange="importData(event)">
+      </label>
+    </div>
+  </div>
 </header>
 
 <nav class="tab-nav">
-  <button class="tab-btn active" onclick="switchTab('daily')">Daily</button>
-  <button class="tab-btn" onclick="switchTab('weekly')">Weekly</button>
-  <button class="tab-btn" onclick="switchTab('monthly')">Monthly</button>
+  <button class="tab-btn active" onclick="switchTab('daily', this)">Daily</button>
+  <button class="tab-btn" onclick="switchTab('weekly', this)">Weekly</button>
+  <button class="tab-btn" onclick="switchTab('monthly', this)">Monthly</button>
 </nav>
 
-<!-- ═══════════════════════════════════════════════
-     DAILY TAB
-════════════════════════════════════════════════ -->
+<!-- ═══════════════════════ DAILY ═══════════════════════ -->
 <div id="tab-daily" class="tab-content active">
   <div class="page">
 
     <div class="date-nav">
-      <button class="date-nav-btn" onclick="shiftDay(-1)">&#8592;</button>
+      <button class="btn-icon" onclick="shiftDay(-1)">&#8592;</button>
       <input type="date" id="dailyDate" onchange="loadDailyEntry()">
-      <button class="date-nav-btn" onclick="shiftDay(1)">&#8594;</button>
-      <button class="today-btn" onclick="goToday()">Today</button>
+      <button class="btn-icon" onclick="shiftDay(1)">&#8594;</button>
+      <button class="btn-icon" onclick="goToday()">Today</button>
     </div>
+
+    <div class="week-strip" id="weekStrip"></div>
 
     <!-- Before Dials -->
     <div class="section">
       <div class="section-header">
-        <div class="section-icon icon-blue">🎯</div>
-        <div class="section-title">Before Dials</div>
+        <span class="section-icon">&#9654;</span>
+        <span class="section-title">Before Dials</span>
       </div>
       <div class="section-body">
 
         <div class="field">
-          <label>Skill Focus for This Session</label>
-          <div class="skill-chips" id="skillChips">
-            <div class="skill-chip" onclick="selectChip(this, 'Opening / Pattern Interrupt')">Opening / Pattern Interrupt</div>
-            <div class="skill-chip" onclick="selectChip(this, 'Tone & Pacing')">Tone & Pacing</div>
-            <div class="skill-chip" onclick="selectChip(this, 'Pain Digging')">Pain Digging</div>
-            <div class="skill-chip" onclick="selectChip(this, 'Handling Objections')">Handling Objections</div>
-            <div class="skill-chip" onclick="selectChip(this, 'The Ask / Close')">The Ask / Close</div>
-            <div class="skill-chip" onclick="selectChip(this, 'Listening')">Listening</div>
+          <label>Skill Focus — This Session</label>
+          <div class="skill-chips" id="skillChips"></div>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="skillFocus" placeholder="Type a skill or select above..." oninput="clearChips()" style="flex:1">
+            <button class="btn btn-secondary btn-sm" onclick="saveCustomChip()" style="white-space:nowrap">+ Save Chip</button>
           </div>
-          <input type="text" id="skillFocus" placeholder="Or type a custom skill..." oninput="clearChips()">
         </div>
 
         <div class="field">
@@ -649,11 +796,12 @@
 
         <div class="field">
           <label>How You'll Respond Differently Today</label>
-          <textarea id="responseToday" class="short" placeholder="Be specific — what words will you use?"></textarea>
+          <textarea id="responseToday" class="short" placeholder="Be specific — what exact words will you use?"></textarea>
         </div>
 
         <div class="btn-row">
           <button class="btn btn-primary" onclick="saveBefore()">Save Before Dials</button>
+          <span class="btn-hint">or Cmd+S</span>
         </div>
       </div>
     </div>
@@ -661,8 +809,8 @@
     <!-- After Dials -->
     <div class="section">
       <div class="section-header">
-        <div class="section-icon icon-green">📊</div>
-        <div class="section-title">After Dials</div>
+        <span class="section-icon">&#9724;</span>
+        <span class="section-title">After Dials</span>
       </div>
       <div class="section-body">
 
@@ -685,19 +833,20 @@
         </div>
 
         <div class="field">
-          <label>Pattern Tracker — One Thing That Worked</label>
-          <textarea id="thingWorked" class="short" placeholder="One sentence only."></textarea>
-          <div class="char-hint">Keep it to one sentence.</div>
+          <label>One Thing That Worked</label>
+          <textarea id="thingWorked" class="short" placeholder="One sentence."></textarea>
+          <div class="char-hint">// pattern tracker — keep it to one sentence</div>
         </div>
 
         <div class="field">
-          <label>Pattern Tracker — One Thing You Changed</label>
-          <textarea id="thingChanged" class="short" placeholder="One sentence only."></textarea>
-          <div class="char-hint">Keep it to one sentence.</div>
+          <label>One Thing You Changed</label>
+          <textarea id="thingChanged" class="short" placeholder="One sentence."></textarea>
+          <div class="char-hint">// pattern tracker — keep it to one sentence</div>
         </div>
 
         <div class="btn-row">
           <button class="btn btn-primary" onclick="saveAfter()">Save After Dials</button>
+          <span class="btn-hint">or Cmd+S</span>
         </div>
       </div>
     </div>
@@ -705,8 +854,8 @@
     <!-- Pattern Log -->
     <div class="section">
       <div class="section-header">
-        <div class="section-icon icon-yellow">📈</div>
-        <div class="section-title">Pattern Log</div>
+        <span class="section-icon">&#9632;</span>
+        <span class="section-title">Pattern Log</span>
         <div class="section-badge" id="patternCount">0 entries</div>
       </div>
       <div class="section-body">
@@ -717,33 +866,48 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════
-     WEEKLY TAB
-════════════════════════════════════════════════ -->
+<!-- ═══════════════════════ WEEKLY ═══════════════════════ -->
 <div id="tab-weekly" class="tab-content">
   <div class="page">
 
-    <div class="week-nav">
-      <button class="date-nav-btn" onclick="shiftWeek(-1)">&#8592;</button>
-      <div class="week-label" id="weekLabel"></div>
-      <button class="date-nav-btn" onclick="shiftWeek(1)">&#8594;</button>
-      <button class="today-btn" onclick="goCurrentWeek()">This Week</button>
+    <div class="period-nav">
+      <button class="btn-icon" onclick="shiftWeek(-1)">&#8592;</button>
+      <div class="period-label" id="weekLabel"></div>
+      <button class="btn-icon" onclick="shiftWeek(1)">&#8594;</button>
+      <button class="btn-icon" onclick="goCurrentWeek()">This Week</button>
+    </div>
+
+    <!-- This week's daily summary (auto-pulled) -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">&#9670;</span>
+        <span class="section-title">This Week's Daily Log</span>
+        <div class="section-badge">auto-pulled</div>
+      </div>
+      <div class="section-body">
+        <div id="weekDailySummary"></div>
+        <div class="divider"></div>
+        <div>
+          <label style="margin-bottom:8px">Skill Rating Averages This Week</label>
+          <div class="skill-agg" id="skillAggDisplay"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Call Patterns -->
     <div class="section">
       <div class="section-header">
-        <div class="section-icon icon-blue">🔍</div>
-        <div class="section-title">Call Pattern Analysis</div>
+        <span class="section-icon">&#9670;</span>
+        <span class="section-title">Call Pattern Analysis</span>
       </div>
       <div class="section-body">
-        <div class="prose-field">
-          <div class="prose-label">Where did conversations die this week?</div>
-          <textarea id="w_convosDied" placeholder="Pull your call notes. Look for the moment things went sideways — what were they saying, what were you saying?"></textarea>
+        <div class="field">
+          <label>Where Did Conversations Die This Week?</label>
+          <textarea id="w_convosDied" placeholder="Pull your call notes. Look for the moment things went sideways."></textarea>
         </div>
-        <div class="prose-field">
-          <div class="prose-label">What did prospects say right before you lost them?</div>
-          <textarea id="w_lostMoment" placeholder="Exact phrases, objections, or tone shifts you noticed."></textarea>
+        <div class="field">
+          <label>What Did Prospects Say Right Before You Lost Them?</label>
+          <textarea id="w_lostMoment" placeholder="Exact phrases, objections, tone shifts."></textarea>
         </div>
       </div>
     </div>
@@ -751,16 +915,16 @@
     <!-- Call Replay -->
     <div class="section">
       <div class="section-header">
-        <div class="section-icon icon-yellow">🎧</div>
-        <div class="section-title">Call Replay Notes</div>
+        <span class="section-icon">&#9670;</span>
+        <span class="section-title">Call Replay Notes</span>
       </div>
       <div class="section-body">
-        <div class="prose-field">
-          <div class="prose-label">The "we're good" moment — what did you say after?</div>
+        <div class="field">
+          <label>The "We're Good" Moment — What Did You Say After?</label>
           <textarea id="w_weAreGood" placeholder="Listen to 2–3 calls. What happened right after they brushed you off?"></textarea>
         </div>
-        <div class="prose-field">
-          <div class="prose-label">What could you have said instead?</div>
+        <div class="field">
+          <label>What Could You Have Said Instead?</label>
           <textarea id="w_couldHaveSaid" placeholder="Write out the alternative response you'll try next time."></textarea>
         </div>
       </div>
@@ -769,8 +933,8 @@
     <!-- Objection Bank -->
     <div class="section">
       <div class="section-header">
-        <div class="section-icon icon-red">🛡️</div>
-        <div class="section-title">Objection Bank</div>
+        <span class="section-icon">&#9670;</span>
+        <span class="section-title">Objection Bank</span>
         <div class="section-badge" id="objectionCount">0 entries</div>
       </div>
       <div class="section-body">
@@ -781,27 +945,31 @@
           </div>
           <div class="field" style="margin-bottom:0">
             <label>Your Best Current Response</label>
-            <textarea id="newResponse" class="short" placeholder="How you handle it now. Keep refining this over time."></textarea>
+            <textarea id="newResponse" class="short" placeholder="How you handle it now. Refine over time."></textarea>
           </div>
-          <button class="btn btn-primary btn-sm" style="align-self:flex-start" onclick="addObjection()">Add to Bank</button>
+          <button class="btn btn-primary btn-sm" style="align-self:flex-start" onclick="addObjection()">+ Add to Bank</button>
+        </div>
+        <div class="obj-search">
+          <input type="text" id="objSearchInput" placeholder="// search objections..." oninput="renderObjectionBank()">
         </div>
         <div id="objectionBank"></div>
       </div>
     </div>
 
-    <!-- Week Focus -->
+    <!-- Next Week Focus -->
     <div class="section">
       <div class="section-header">
-        <div class="section-icon icon-green">🎯</div>
-        <div class="section-title">Skill Focus — Next Week</div>
+        <span class="section-icon">&#9670;</span>
+        <span class="section-title">Skill Focus — Next Week</span>
       </div>
       <div class="section-body">
         <div class="field">
           <label>One Skill to Own Next Week</label>
-          <input type="text" id="w_nextSkill" placeholder="Be specific. Not 'be better' — what exact thing will you practice on every call?">
+          <input type="text" id="w_nextSkill" placeholder="Not 'be better' — what exact thing will you practice on every call?">
         </div>
         <div class="btn-row">
           <button class="btn btn-primary" onclick="saveWeekly()">Save Weekly Review</button>
+          <span class="btn-hint">or Cmd+S</span>
         </div>
       </div>
     </div>
@@ -809,65 +977,64 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════
-     MONTHLY TAB
-════════════════════════════════════════════════ -->
+<!-- ═══════════════════════ MONTHLY ═══════════════════════ -->
 <div id="tab-monthly" class="tab-content">
   <div class="page">
 
-    <div class="week-nav">
-      <button class="date-nav-btn" onclick="shiftMonth(-1)">&#8592;</button>
-      <div class="week-label" id="monthLabel"></div>
-      <button class="date-nav-btn" onclick="shiftMonth(1)">&#8594;</button>
-      <button class="today-btn" onclick="goCurrentMonth()">This Month</button>
+    <div class="period-nav">
+      <button class="btn-icon" onclick="shiftMonth(-1)">&#8592;</button>
+      <div class="period-label" id="monthLabel"></div>
+      <button class="btn-icon" onclick="shiftMonth(1)">&#8594;</button>
+      <button class="btn-icon" onclick="goCurrentMonth()">This Month</button>
     </div>
 
     <!-- Objection Bank Review -->
     <div class="section">
       <div class="section-header">
-        <div class="section-icon icon-red">🛡️</div>
-        <div class="section-title">Objection Bank Review</div>
+        <span class="section-icon">&#9670;</span>
+        <span class="section-title">Objection Bank Review</span>
       </div>
       <div class="section-body">
-        <div class="prose-field">
-          <div class="prose-label">Which responses still feel weak? What are you rewriting?</div>
-          <textarea id="m_weakResponses" placeholder="Go through the objection bank below. Which ones aren't landing? Write your rewrites here."></textarea>
+        <div class="field">
+          <label>Which Responses Still Feel Weak? What Are You Rewriting?</label>
+          <textarea id="m_weakResponses" placeholder="Go through the bank below. Which ones aren't landing? Write your rewrites here."></textarea>
         </div>
-
-        <div style="margin-top:16px; border-top: 1px solid var(--border); padding-top:16px;">
-          <div class="prose-label" style="margin-bottom:10px;">Live Objection Bank</div>
-          <div id="objectionBankMonthly"></div>
+        <div class="divider"></div>
+        <label style="margin-bottom:10px">Live Objection Bank</label>
+        <div class="obj-search">
+          <input type="text" id="objSearchMonthly" placeholder="// search objections..." oninput="renderObjectionBank()">
         </div>
+        <div id="objectionBankMonthly"></div>
       </div>
     </div>
 
     <!-- Demo Conversion -->
     <div class="section">
       <div class="section-header">
-        <div class="section-icon icon-blue">📅</div>
-        <div class="section-title">Demo Conversion Rate</div>
+        <span class="section-icon">&#9670;</span>
+        <span class="section-title">Demo Conversion Rate</span>
       </div>
       <div class="section-body">
         <div class="stats-row">
           <div class="stat-input-group">
             <label>Demos Booked</label>
-            <input type="text" id="m_demosBooked" placeholder="0" oninput="calcConversion()">
+            <input type="number" id="m_demosBooked" placeholder="0" oninput="calcConversion()">
           </div>
           <div class="stat-input-group">
             <label>Demos Showed</label>
-            <input type="text" id="m_demosShowed" placeholder="0" oninput="calcConversion()">
+            <input type="number" id="m_demosShowed" placeholder="0" oninput="calcConversion()">
           </div>
         </div>
         <div class="conversion-display" id="conversionDisplay" style="display:none">
-          <div class="conversion-rate" id="conversionRate">—</div>
+          <span class="conversion-rate" id="conversionRate">—</span>
           <div class="conversion-label">Show Rate</div>
         </div>
-        <div class="field" style="margin-top:14px; margin-bottom:0">
+        <div class="field" style="margin-top:14px;margin-bottom:0">
           <label>Notes — Are No-Shows High? Why?</label>
-          <textarea id="m_demoNotes" class="short" placeholder="If show rate is low, are you pushing for the demo without enough buy-in? What's the pattern?"></textarea>
+          <textarea id="m_demoNotes" class="short" placeholder="If show rate is low, are you pushing for the demo without enough buy-in?"></textarea>
         </div>
         <div class="btn-row">
-          <button class="btn btn-primary" onclick="saveDemoStats()">Save</button>
+          <button class="btn btn-primary" onclick="saveDemoStats()">Save Stats</button>
         </div>
       </div>
     </div>
@@ -875,8 +1042,8 @@
     <!-- Sales Content -->
     <div class="section">
       <div class="section-header">
-        <div class="section-icon icon-green">📚</div>
-        <div class="section-title">Sales Content This Month</div>
+        <span class="section-icon">&#9670;</span>
+        <span class="section-title">Sales Content This Month</span>
       </div>
       <div class="section-body">
         <div class="field">
@@ -889,6 +1056,7 @@
         </div>
         <div class="btn-row">
           <button class="btn btn-primary" onclick="saveMonthly()">Save Monthly Review</button>
+          <span class="btn-hint">or Cmd+S</span>
         </div>
       </div>
     </div>
@@ -896,16 +1064,28 @@
   </div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-// ── State ──────────────────────────────────────────────
+// ── Constants ────────────────────────────────────────────
+const DEFAULT_SKILLS = [
+  'Opening / Pattern Interrupt',
+  'Tone & Pacing',
+  'Pain Digging',
+  'Handling Objections',
+  'The Ask / Close',
+  'Listening'
+];
+
+const RATING_LABELS = ['', 'Forgot / Nope', 'Tried It', 'Nailed It'];
+
+// ── State ────────────────────────────────────────────────
 let selectedRating = 0;
+let activeTab = 'daily';
 let currentWeekOffset = 0;
 let currentMonthOffset = 0;
 
-// ── Init ───────────────────────────────────────────────
+// ── Init ─────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   updateHeaderDate();
   initDaily();
@@ -913,44 +1093,108 @@ document.addEventListener('DOMContentLoaded', () => {
   initMonthly();
   renderPatternLog();
   renderObjectionBank();
+  document.addEventListener('keydown', handleKeyDown);
 });
 
-// ── Tab Switching ──────────────────────────────────────
-function switchTab(tab) {
+// ── Keyboard Shortcut ────────────────────────────────────
+function handleKeyDown(e) {
+  if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+    e.preventDefault();
+    if (activeTab === 'daily') {
+      // determine which section has focus
+      const afterFields = ['thingWorked', 'thingChanged'];
+      const focused = document.activeElement?.id;
+      if (afterFields.includes(focused) || selectedRating > 0) {
+        saveAfter();
+      } else {
+        saveBefore();
+      }
+    } else if (activeTab === 'weekly') {
+      saveWeekly();
+    } else if (activeTab === 'monthly') {
+      saveMonthly();
+    }
+  }
+}
+
+// ── Tab ──────────────────────────────────────────────────
+function switchTab(tab, btn) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
-  event.target.classList.add('active');
-  if (tab === 'weekly' || tab === 'monthly') renderObjectionBank();
+  btn.classList.add('active');
+  activeTab = tab;
+  if (tab === 'weekly') { loadWeeklyEntry(); renderObjectionBank(); }
+  if (tab === 'monthly') { renderObjectionBank(); }
 }
 
-// ── Helpers ────────────────────────────────────────────
+// ── Helpers ──────────────────────────────────────────────
 function todayStr() {
   return new Date().toISOString().split('T')[0];
 }
 
-function fmtDate(str) {
-  const d = new Date(str + 'T12:00:00');
-  return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+function fmtShort(str) {
+  return new Date(str + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function fmtDay(str) {
+  return new Date(str + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
 }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
+  t.textContent = '> ' + msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2200);
 }
 
 function updateHeaderDate() {
-  document.getElementById('headerDate').textContent = new Date().toLocaleDateString('en-US', {
-    weekday: 'short', month: 'short', day: 'numeric'
-  });
+  document.getElementById('headerDate').textContent =
+    new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase();
 }
 
-// ── Daily ──────────────────────────────────────────────
+// ── Export / Import ──────────────────────────────────────
+function exportData() {
+  const data = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    try { data[key] = JSON.parse(localStorage.getItem(key)); }
+    catch { data[key] = localStorage.getItem(key); }
+  }
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'salesdash-backup-' + todayStr() + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Backup exported');
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      Object.keys(data).forEach(key => {
+        localStorage.setItem(key, typeof data[key] === 'string' ? data[key] : JSON.stringify(data[key]));
+      });
+      showToast('Backup imported — reloading...');
+      setTimeout(() => location.reload(), 1000);
+    } catch {
+      showToast('Import failed — invalid file');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ── Daily ────────────────────────────────────────────────
 function initDaily() {
-  const inp = document.getElementById('dailyDate');
-  inp.value = todayStr();
+  document.getElementById('dailyDate').value = todayStr();
+  renderSkillChips();
   loadDailyEntry();
 }
 
@@ -971,23 +1215,21 @@ function loadDailyEntry() {
   const date = document.getElementById('dailyDate').value;
   const data = getDaily(date);
 
-  // Before
   document.getElementById('skillFocus').value = data.skillFocus || '';
   document.getElementById('objectionYesterday').value = data.objectionYesterday || '';
   document.getElementById('responseToday').value = data.responseToday || '';
 
-  // Chips
-  document.querySelectorAll('.skill-chip').forEach(c => {
-    c.classList.toggle('active', c.textContent === data.skillFocus);
-  });
+  renderSkillChips(data.skillFocus);
 
-  // After
   selectedRating = data.rating || 0;
   document.querySelectorAll('.rating-btn').forEach((b, i) => {
-    b.className = 'rating-btn' + (selectedRating === i+1 ? ` selected-${i+1}` : '');
+    b.className = 'rating-btn' + (selectedRating === i+1 ? ` sel-${i+1}` : '');
   });
+
   document.getElementById('thingWorked').value = data.thingWorked || '';
   document.getElementById('thingChanged').value = data.thingChanged || '';
+
+  renderWeekStrip(date);
 }
 
 function getDaily(date) {
@@ -1001,7 +1243,8 @@ function saveBefore() {
   data.objectionYesterday = document.getElementById('objectionYesterday').value.trim();
   data.responseToday = document.getElementById('responseToday').value.trim();
   localStorage.setItem('daily_' + date, JSON.stringify(data));
-  showToast('Before Dials saved ✓');
+  renderWeekStrip(date);
+  showToast('Before dials saved');
 }
 
 function saveAfter() {
@@ -1011,21 +1254,34 @@ function saveAfter() {
   data.thingWorked = document.getElementById('thingWorked').value.trim();
   data.thingChanged = document.getElementById('thingChanged').value.trim();
   localStorage.setItem('daily_' + date, JSON.stringify(data));
-
-  // Add to pattern log if we have content
-  if (data.thingWorked || data.thingChanged) {
-    addToPatternLog(date, data);
-  }
-
-  showToast('After Dials saved ✓');
+  if (data.thingWorked || data.thingChanged) addToPatternLog(date, data);
+  renderWeekStrip(date);
   renderPatternLog();
+  showToast('After dials saved');
 }
 
 function selectRating(n) {
   selectedRating = n;
   document.querySelectorAll('.rating-btn').forEach((b, i) => {
-    b.className = 'rating-btn' + (i+1 === n ? ` selected-${i+1}` : '');
+    b.className = 'rating-btn' + (i+1 === n ? ` sel-${i+1}` : '');
   });
+}
+
+// ── Skill Chips ──────────────────────────────────────────
+function getCustomSkills() {
+  return JSON.parse(localStorage.getItem('customSkills') || '[]');
+}
+
+function renderSkillChips(active) {
+  const all = [...DEFAULT_SKILLS, ...getCustomSkills()];
+  const container = document.getElementById('skillChips');
+  container.innerHTML = all.map((s, i) => {
+    const isCustom = i >= DEFAULT_SKILLS.length;
+    const isActive = s === active;
+    return `<div class="skill-chip${isActive ? ' active' : ''}${isCustom ? ' custom-chip' : ''}" onclick="selectChip(this, '${s.replace(/'/g,"\\'")}')">
+      ${s}${isCustom ? `<span class="skill-chip-del" onclick="event.stopPropagation();deleteCustomChip(${i - DEFAULT_SKILLS.length})">×</span>` : ''}
+    </div>`;
+  }).join('');
 }
 
 function selectChip(el, skill) {
@@ -1038,14 +1294,65 @@ function clearChips() {
   document.querySelectorAll('.skill-chip').forEach(c => c.classList.remove('active'));
 }
 
-// ── Pattern Log ────────────────────────────────────────
+function saveCustomChip() {
+  const val = document.getElementById('skillFocus').value.trim();
+  if (!val) { showToast('Type a skill first'); return; }
+  if (DEFAULT_SKILLS.includes(val)) { showToast('Already a default chip'); return; }
+  const custom = getCustomSkills();
+  if (custom.includes(val)) { showToast('Chip already saved'); return; }
+  custom.push(val);
+  localStorage.setItem('customSkills', JSON.stringify(custom));
+  renderSkillChips(val);
+  showToast('Skill chip saved');
+}
+
+function deleteCustomChip(idx) {
+  const custom = getCustomSkills();
+  custom.splice(idx, 1);
+  localStorage.setItem('customSkills', JSON.stringify(custom));
+  const current = document.getElementById('skillFocus').value;
+  renderSkillChips(current);
+  showToast('Chip removed');
+}
+
+// ── Week Strip ───────────────────────────────────────────
+function renderWeekStrip(activeDate) {
+  const d = new Date(activeDate + 'T12:00:00');
+  const dow = d.getDay(); // 0=Sun
+  const weekStart = new Date(d);
+  weekStart.setDate(d.getDate() - dow);
+
+  const today = todayStr();
+  const days = ['S','M','T','W','T','F','S'];
+  let html = '';
+
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(weekStart);
+    day.setDate(weekStart.getDate() + i);
+    const ds = day.toISOString().split('T')[0];
+    const entry = getDaily(ds);
+    const hasEntry = !!(entry.skillFocus || entry.thingWorked || entry.thingChanged);
+    const isToday = ds === today;
+    html += `<div class="week-day${hasEntry ? ' has-entry' : ''}${isToday ? ' is-today' : ''}" onclick="jumpToDate('${ds}')">
+      <div class="week-day-label">${days[i]}</div>
+      <div class="week-day-dot"></div>
+    </div>`;
+  }
+
+  document.getElementById('weekStrip').innerHTML = html;
+}
+
+function jumpToDate(ds) {
+  document.getElementById('dailyDate').value = ds;
+  loadDailyEntry();
+}
+
+// ── Pattern Log ──────────────────────────────────────────
 function addToPatternLog(date, data) {
   let log = JSON.parse(localStorage.getItem('patternLog') || '[]');
-  // replace existing entry for same date
   log = log.filter(e => e.date !== date);
   log.unshift({ date, skill: data.skillFocus, rating: data.rating, worked: data.thingWorked, changed: data.thingChanged });
-  // keep last 60 entries
-  log = log.slice(0, 60);
+  log = log.slice(0, 90);
   localStorage.setItem('patternLog', JSON.stringify(log));
 }
 
@@ -1058,24 +1365,22 @@ function deletePatternEntry(date) {
 
 function renderPatternLog() {
   const log = JSON.parse(localStorage.getItem('patternLog') || '[]');
-  const el = document.getElementById('patternLog');
   document.getElementById('patternCount').textContent = log.length + ' ' + (log.length === 1 ? 'entry' : 'entries');
 
   if (!log.length) {
-    el.innerHTML = '<div class="empty-state">No entries yet. Complete your After Dials to start tracking patterns.</div>';
+    document.getElementById('patternLog').innerHTML = '<div class="empty-state">// No entries yet. Complete After Dials to start tracking.</div>';
     return;
   }
 
-  const ratingLabel = ['', 'Forgot / Nope', 'Tried It', 'Nailed It'];
-
-  el.innerHTML = '<div class="log-list">' + log.map(e => `
+  document.getElementById('patternLog').innerHTML = '<div class="log-list">' + log.map(e => `
     <div class="log-item">
       <div class="log-item-meta">
-        ${new Date(e.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-        ${e.rating ? `<br><span class="tag-rating-${e.rating}">${ratingLabel[e.rating]}</span>` : ''}
-        ${e.skill ? `<br><span style="color:var(--accent);font-size:10px">${e.skill}</span>` : ''}
+        ${fmtShort(e.date)}<br>
+        ${fmtDay(e.date)}
+        ${e.rating ? `<br><span class="tag-r${e.rating}">${['','1','2','3'][e.rating]}</span>` : ''}
       </div>
       <div class="log-item-content">
+        ${e.skill ? `<div class="log-item-row" style="color:var(--accent);font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px">${e.skill}</div>` : ''}
         ${e.worked ? `<div class="log-item-row"><span class="tag-worked">Worked</span>${e.worked}</div>` : ''}
         ${e.changed ? `<div class="log-item-row"><span class="tag-changed">Changed</span>${e.changed}</div>` : ''}
       </div>
@@ -1084,45 +1389,39 @@ function renderPatternLog() {
   `).join('') + '</div>';
 }
 
-// ── Weekly ─────────────────────────────────────────────
-function getWeekKey(offset) {
-  const d = new Date();
-  d.setDate(d.getDate() - d.getDay() + (offset * 7));
-  return 'week_' + d.toISOString().split('T')[0].slice(0, 7) + '_w' + getWeekOfYear(d);
-}
-
-function getWeekOfYear(d) {
-  const start = new Date(d.getFullYear(), 0, 1);
-  return Math.ceil(((d - start) / 86400000 + start.getDay() + 1) / 7);
-}
-
-function getWeekRange(offset) {
+// ── Weekly ───────────────────────────────────────────────
+function getWeekBounds(offset) {
   const d = new Date();
   d.setDate(d.getDate() - d.getDay() + (offset * 7));
   const start = new Date(d); start.setDate(d.getDate() - d.getDay());
   const end = new Date(start); end.setDate(start.getDate() + 6);
-  const fmt = (dt) => dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return { start, end };
+}
+
+function getWeekKey(offset) {
+  const { start } = getWeekBounds(offset);
+  return 'week_' + start.toISOString().split('T')[0];
+}
+
+function getWeekRange(offset) {
+  const { start, end } = getWeekBounds(offset);
+  const fmt = dt => dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   return `${fmt(start)} – ${fmt(end)}, ${end.getFullYear()}`;
 }
 
 function initWeekly() {
-  updateWeekLabel();
-  loadWeeklyEntry();
-}
-
-function updateWeekLabel() {
-  document.getElementById('weekLabel').textContent = getWeekRange(currentWeekOffset);
+  document.getElementById('weekLabel').textContent = getWeekRange(0);
 }
 
 function shiftWeek(delta) {
   currentWeekOffset += delta;
-  updateWeekLabel();
+  document.getElementById('weekLabel').textContent = getWeekRange(currentWeekOffset);
   loadWeeklyEntry();
 }
 
 function goCurrentWeek() {
   currentWeekOffset = 0;
-  updateWeekLabel();
+  document.getElementById('weekLabel').textContent = getWeekRange(0);
   loadWeeklyEntry();
 }
 
@@ -1134,22 +1433,73 @@ function loadWeeklyEntry() {
   document.getElementById('w_weAreGood').value = data.weAreGood || '';
   document.getElementById('w_couldHaveSaid').value = data.couldHaveSaid || '';
   document.getElementById('w_nextSkill').value = data.nextSkill || '';
+  renderWeekDailySummary();
+}
+
+function renderWeekDailySummary() {
+  const { start } = getWeekBounds(currentWeekOffset);
+  const entries = [];
+  const skillRatings = {};
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    const ds = d.toISOString().split('T')[0];
+    const entry = getDaily(ds);
+    if (entry.skillFocus || entry.thingWorked || entry.rating) {
+      entries.push({ date: ds, ...entry });
+      if (entry.skillFocus && entry.rating) {
+        if (!skillRatings[entry.skillFocus]) skillRatings[entry.skillFocus] = [];
+        skillRatings[entry.skillFocus].push(entry.rating);
+      }
+    }
+  }
+
+  const summaryEl = document.getElementById('weekDailySummary');
+  if (!entries.length) {
+    summaryEl.innerHTML = '<div class="empty-state">// No daily entries found for this week.</div>';
+  } else {
+    summaryEl.innerHTML = '<div class="week-summary">' + entries.map(e => `
+      <div class="week-summary-row">
+        <span class="wsr-date">${fmtShort(e.date)}</span>
+        <span class="wsr-skill">${e.skillFocus || '—'}</span>
+        <span class="wsr-worked">${e.thingWorked ? e.thingWorked : '<span style="color:var(--text-muted)">no after-dials logged</span>'}</span>
+        ${e.rating ? `<span class="tag-r${e.rating}" style="font-size:10px;font-weight:700">${RATING_LABELS[e.rating]}</span>` : ''}
+      </div>
+    `).join('') + '</div>';
+  }
+
+  // skill aggregates
+  const aggEl = document.getElementById('skillAggDisplay');
+  const keys = Object.keys(skillRatings);
+  if (!keys.length) {
+    aggEl.innerHTML = '<span style="color:var(--text-muted);font-size:10px;letter-spacing:1px">// No rated sessions this week.</span>';
+  } else {
+    aggEl.innerHTML = keys.map(skill => {
+      const ratings = skillRatings[skill];
+      const avg = (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1);
+      return `<div class="skill-agg-item">
+        <span class="agg-name">${skill}</span>
+        <span class="agg-avg">${avg} avg</span>
+        <span style="color:var(--text-muted);font-size:9px;margin-left:4px">(${ratings.length} session${ratings.length > 1 ? 's' : ''})</span>
+      </div>`;
+    }).join('');
+  }
 }
 
 function saveWeekly() {
   const key = getWeekKey(currentWeekOffset);
-  const data = {
+  localStorage.setItem(key, JSON.stringify({
     convosDied: document.getElementById('w_convosDied').value.trim(),
     lostMoment: document.getElementById('w_lostMoment').value.trim(),
     weAreGood: document.getElementById('w_weAreGood').value.trim(),
     couldHaveSaid: document.getElementById('w_couldHaveSaid').value.trim(),
     nextSkill: document.getElementById('w_nextSkill').value.trim(),
-  };
-  localStorage.setItem(key, JSON.stringify(data));
-  showToast('Weekly review saved ✓');
+  }));
+  showToast('Weekly review saved');
 }
 
-// ── Monthly ────────────────────────────────────────────
+// ── Monthly ──────────────────────────────────────────────
 function getMonthKey(offset) {
   const d = new Date();
   d.setMonth(d.getMonth() + offset);
@@ -1159,27 +1509,22 @@ function getMonthKey(offset) {
 function getMonthLabel(offset) {
   const d = new Date();
   d.setMonth(d.getMonth() + offset);
-  return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }).toUpperCase();
 }
 
 function initMonthly() {
-  updateMonthLabel();
-  loadMonthlyEntry();
-}
-
-function updateMonthLabel() {
-  document.getElementById('monthLabel').textContent = getMonthLabel(currentMonthOffset);
+  document.getElementById('monthLabel').textContent = getMonthLabel(0);
 }
 
 function shiftMonth(delta) {
   currentMonthOffset += delta;
-  updateMonthLabel();
+  document.getElementById('monthLabel').textContent = getMonthLabel(currentMonthOffset);
   loadMonthlyEntry();
 }
 
 function goCurrentMonth() {
   currentMonthOffset = 0;
-  updateMonthLabel();
+  document.getElementById('monthLabel').textContent = getMonthLabel(0);
   loadMonthlyEntry();
 }
 
@@ -1201,10 +1546,14 @@ function calcConversion() {
   const display = document.getElementById('conversionDisplay');
   if (booked > 0) {
     const rate = Math.round((showed / booked) * 100);
-    document.getElementById('conversionRate').textContent = rate + '%';
-    display.style.display = 'block';
     const rateEl = document.getElementById('conversionRate');
-    rateEl.style.color = rate >= 70 ? 'var(--green)' : rate >= 50 ? 'var(--yellow)' : 'var(--red)';
+    rateEl.textContent = rate + '%';
+    rateEl.style.color = rate >= 70 ? 'var(--green)' : rate >= 50 ? 'var(--amber)' : 'var(--red)';
+    rateEl.style.textShadow = rate >= 70
+      ? '0 0 20px rgba(0,232,122,0.5)'
+      : rate >= 50 ? '0 0 20px rgba(255,170,0,0.5)'
+      : '0 0 20px rgba(255,42,0,0.5)';
+    display.style.display = 'block';
   } else {
     display.style.display = 'none';
   }
@@ -1217,7 +1566,7 @@ function saveDemoStats() {
   data.demosShowed = document.getElementById('m_demosShowed').value.trim();
   data.demoNotes = document.getElementById('m_demoNotes').value.trim();
   localStorage.setItem(key, JSON.stringify(data));
-  showToast('Demo stats saved ✓');
+  showToast('Demo stats saved');
 }
 
 function saveMonthly() {
@@ -1227,10 +1576,10 @@ function saveMonthly() {
   data.contentTitle = document.getElementById('m_contentTitle').value.trim();
   data.contentTakeaway = document.getElementById('m_contentTakeaway').value.trim();
   localStorage.setItem(key, JSON.stringify(data));
-  showToast('Monthly review saved ✓');
+  showToast('Monthly review saved');
 }
 
-// ── Objection Bank ─────────────────────────────────────
+// ── Objection Bank ───────────────────────────────────────
 function getObjections() {
   return JSON.parse(localStorage.getItem('objectionBank') || '[]');
 }
@@ -1243,15 +1592,13 @@ function addObjection() {
   const obj = document.getElementById('newObjection').value.trim();
   const res = document.getElementById('newResponse').value.trim();
   if (!obj) { showToast('Add an objection first'); return; }
-
   const arr = getObjections();
   arr.unshift({ id: Date.now(), objection: obj, response: res, date: todayStr() });
   saveObjections(arr);
-
   document.getElementById('newObjection').value = '';
   document.getElementById('newResponse').value = '';
   renderObjectionBank();
-  showToast('Added to objection bank ✓');
+  showToast('Added to objection bank');
 }
 
 function deleteObjection(id) {
@@ -1280,24 +1627,26 @@ function saveEditObjection(id) {
   o.response = item.querySelector('.edit-res-input').value.trim();
   saveObjections(arr);
   renderObjectionBank();
-  showToast('Updated ✓');
+  showToast('Updated');
 }
 
 function renderObjectionBank() {
-  const arr = getObjections();
-  const count = arr.length + ' ' + (arr.length === 1 ? 'entry' : 'entries');
-  const countEl = document.getElementById('objectionCount');
-  if (countEl) countEl.textContent = count;
+  const allArr = getObjections();
+  const weeklyQ = (document.getElementById('objSearchInput')?.value || '').toLowerCase();
+  const monthlyQ = (document.getElementById('objSearchMonthly')?.value || '').toLowerCase();
 
-  const html = arr.length === 0
-    ? '<div class="empty-state">No objections logged yet. Add your first one above.</div>'
-    : arr.map(o => `
+  const countEl = document.getElementById('objectionCount');
+  if (countEl) countEl.textContent = allArr.length + ' ' + (allArr.length === 1 ? 'entry' : 'entries');
+
+  function buildHtml(arr) {
+    if (!arr.length) return '<div class="empty-state">// No objections match.</div>';
+    return arr.map(o => `
       <div class="objection-item" data-id="${o.id}">
         <div class="objection-view">
           <div class="objection-q">"${o.objection}"</div>
           <div class="objection-a">${o.response || '<em style="color:var(--text-muted)">No response written yet.</em>'}</div>
           <div class="objection-meta">
-            <span class="objection-date">${fmtDate(o.date)}</span>
+            <span class="objection-date">${fmtShort(o.date)}</span>
             <div class="objection-actions">
               <button class="btn btn-secondary btn-sm" onclick="startEditObjection(${o.id})">Edit</button>
               <button class="btn btn-danger btn-sm" onclick="deleteObjection(${o.id})">Remove</button>
@@ -1305,14 +1654,8 @@ function renderObjectionBank() {
           </div>
         </div>
         <div class="objection-edit-form">
-          <div>
-            <label>Objection</label>
-            <input type="text" class="edit-obj-input">
-          </div>
-          <div>
-            <label>Response</label>
-            <textarea class="edit-res-input short"></textarea>
-          </div>
+          <div><label>Objection</label><input type="text" class="edit-obj-input"></div>
+          <div><label>Response</label><textarea class="edit-res-input short"></textarea></div>
           <div style="display:flex;gap:8px">
             <button class="btn btn-primary btn-sm" onclick="saveEditObjection(${o.id})">Save</button>
             <button class="btn btn-secondary btn-sm" onclick="cancelEditObjection(${o.id})">Cancel</button>
@@ -1320,11 +1663,27 @@ function renderObjectionBank() {
         </div>
       </div>
     `).join('');
+  }
 
-  ['objectionBank', 'objectionBankMonthly'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = html;
-  });
+  const wEl = document.getElementById('objectionBank');
+  if (wEl) {
+    const filtered = weeklyQ
+      ? allArr.filter(o => o.objection.toLowerCase().includes(weeklyQ) || o.response.toLowerCase().includes(weeklyQ))
+      : allArr;
+    wEl.innerHTML = filtered.length === 0 && allArr.length === 0
+      ? '<div class="empty-state">// No objections logged yet. Add your first one above.</div>'
+      : buildHtml(filtered);
+  }
+
+  const mEl = document.getElementById('objectionBankMonthly');
+  if (mEl) {
+    const filtered = monthlyQ
+      ? allArr.filter(o => o.objection.toLowerCase().includes(monthlyQ) || o.response.toLowerCase().includes(monthlyQ))
+      : allArr;
+    mEl.innerHTML = filtered.length === 0 && allArr.length === 0
+      ? '<div class="empty-state">// No objections logged yet.</div>'
+      : buildHtml(filtered);
+  }
 }
 </script>
 </body>
