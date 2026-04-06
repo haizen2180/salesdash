@@ -16,7 +16,7 @@
     ],
     "mac": {
       "category": "public.app-category.productivity",
-      "icon": "icon.icns",
+      "icon": "electron.icns",
       "target": "dir"
     }
   },
