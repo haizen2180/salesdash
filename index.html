@@ -964,6 +964,10 @@
               <input type="number" id="connects" placeholder="0" min="0">
             </div>
             <div class="outcome-input">
+              <div class="outcome-label">Demos Asked</div>
+              <input type="number" id="demosAsked" placeholder="0" min="0">
+            </div>
+            <div class="outcome-input">
               <div class="outcome-label">Demos Booked</div>
               <input type="number" id="outcomeDemos" placeholder="0" min="0">
             </div>
@@ -1068,7 +1072,7 @@
           <div class="divider"></div>
           <div class="field" style="margin-bottom:0">
             <label>Looking at this week's data — what's the pattern?</label>
-            <textarea id="w_synthesis" class="short" placeholder="Don't just describe what happened. What does it tell you about where you're at and what needs to change?"></textarea>
+            <textarea id="w_synthesis" class="short" placeholder="Don't just describe what happened. What does the data tell you, and what specifically will you do differently next session?"></textarea>
           </div>
         </div>
       </div>
@@ -1093,13 +1097,9 @@
           <span class="section-title">What Worked This Week</span>
         </div>
         <div class="section-body">
-          <div class="field">
-            <label>Line or Approach That Got a Positive Reaction</label>
-            <textarea id="w_winsLine" class="short" placeholder="What exact thing did you say that landed? Write it out word for word if you can."></textarea>
-          </div>
           <div class="field" style="margin-bottom:0">
-            <label>What Should You Repeat Next Week?</label>
-            <textarea id="w_winsRepeat" class="short" placeholder="Don't let the wins disappear. What specifically should you bring into every call next week?"></textarea>
+            <label>What Worked — Write It Out and Commit to Repeating It Next Week</label>
+            <textarea id="w_winsLine" class="short" placeholder="What exact thing did you say that moved a prospect toward booking? Write it word for word — don't let the win disappear."></textarea>
           </div>
         </div>
       </div>
@@ -1155,12 +1155,12 @@
         </div>
         <div class="section-body">
           <div class="field">
-            <label>The "We're Good" Moment — What Did You Say After?</label>
-            <textarea id="w_weAreGood" placeholder="Listen to 2–3 calls. What happened right after they brushed you off?"></textarea>
+            <label>The Brush-Off You Hit Most This Week</label>
+            <textarea id="w_weAreGood" placeholder="Name it and describe what happened — 'send me info', 'not the right time', 'we're already covered'... What exactly did they say and where in the call did it kill the demo ask?"></textarea>
           </div>
           <div class="field" style="margin-bottom:0">
-            <label>The Exact Reframe You'll Use Next Time</label>
-            <textarea id="w_couldHaveSaid" placeholder="Write it out word for word. Not 'I'll dig into their pain' — write the actual sentence you'll say the moment they brush you off."></textarea>
+            <label>Your Exact Reframe for Next Time</label>
+            <textarea id="w_couldHaveSaid" placeholder="Write the actual sentence you'll say the moment it comes up. Not 'I'll handle it better' — the exact words you'll use to push through and get to the ask."></textarea>
           </div>
         </div>
       </div>
@@ -1295,8 +1295,8 @@
           <input type="text" id="m_contentTitle" placeholder="Title, chapter, podcast episode...">
         </div>
         <div class="field" style="margin-bottom:0">
-          <label>One Thing to Add to Your Process</label>
-          <textarea id="m_contentTakeaway" class="short" placeholder="Just one thing."></textarea>
+          <label>How Does This Change How You Approach the Ask or Handle Objections?</label>
+          <textarea id="m_contentTakeaway" class="short" placeholder="One specific behavior change — how will this show up on your next call?"></textarea>
         </div>
         <div class="btn-row" style="margin-top:12px;margin-bottom:0">
           <button class="btn btn-secondary btn-sm" onclick="addContentEntry()">+ Log Entry</button>
@@ -1486,6 +1486,7 @@ function loadDailyEntry() {
   updateBlockedVisibility();
 
   document.getElementById('connects').value = data.connects || '';
+  document.getElementById('demosAsked').value = data.demosAsked || '';
   document.getElementById('outcomeDemos').value = data.outcomeDemos || '';
   document.getElementById('callbacks').value = data.callbacks || '';
   document.getElementById('blockedBy').value = data.blockedBy || '';
@@ -1516,6 +1517,7 @@ function saveAfter() {
   const data = getDaily(date);
   data.rating = selectedRating;
   data.connects = document.getElementById('connects').value.trim();
+  data.demosAsked = document.getElementById('demosAsked').value.trim();
   data.outcomeDemos = document.getElementById('outcomeDemos').value.trim();
   data.callbacks = document.getElementById('callbacks').value.trim();
   data.blockedBy = document.getElementById('blockedBy').value.trim();
@@ -1723,7 +1725,6 @@ function loadWeeklyEntry() {
   document.getElementById('w_synthesis').value = data.synthesis || '';
   document.getElementById('w_accountability').value = data.accountability || '';
   document.getElementById('w_winsLine').value = data.winsLine || '';
-  document.getElementById('w_winsRepeat').value = data.winsRepeat || '';
   document.getElementById('w_demoBooked').value = data.demoBooked || '';
   document.getElementById('w_demoMissed').value = data.demoMissed || '';
   document.getElementById('w_convosDied').value = data.convosDied || '';
@@ -1766,19 +1767,24 @@ function renderWeekDailySummary() {
 
   // outcome totals
   const totals = entries.reduce((acc, e) => {
-    acc.connects += parseInt(e.connects) || 0;
-    acc.demos += parseInt(e.outcomeDemos) || 0;
-    acc.callbacks += parseInt(e.callbacks) || 0;
+    acc.connects    += parseInt(e.connects)     || 0;
+    acc.demosAsked  += parseInt(e.demosAsked)   || 0;
+    acc.demos       += parseInt(e.outcomeDemos) || 0;
+    acc.callbacks   += parseInt(e.callbacks)    || 0;
     return acc;
-  }, { connects: 0, demos: 0, callbacks: 0 });
+  }, { connects: 0, demosAsked: 0, demos: 0, callbacks: 0 });
 
   const totalsEl = document.getElementById('weekOutcomeTotals');
   if (totals.connects || totals.demos || totals.callbacks) {
+    const askRate = totals.demosAsked > 0
+      ? `<div class="week-total"><span class="week-total-num" style="color:var(--accent)">${((totals.demos / totals.demosAsked) * 100).toFixed(0)}%</span><span class="week-total-label">Ask → Book</span></div>`
+      : '';
     totalsEl.innerHTML = `<div class="week-totals-row">
       <div class="week-total"><span class="week-total-num">${totals.connects}</span><span class="week-total-label">Connects</span></div>
+      ${totals.demosAsked ? `<div class="week-total"><span class="week-total-num" style="color:var(--text-muted)">${totals.demosAsked}</span><span class="week-total-label">Asked</span></div>` : ''}
       <div class="week-total"><span class="week-total-num" style="color:var(--green)">${totals.demos}</span><span class="week-total-label">Demos Booked</span></div>
       <div class="week-total"><span class="week-total-num" style="color:var(--amber)">${totals.callbacks}</span><span class="week-total-label">Callbacks</span></div>
-      ${totals.connects > 0 ? `<div class="week-total"><span class="week-total-num" style="color:var(--accent)">${((totals.demos / totals.connects) * 100).toFixed(0)}%</span><span class="week-total-label">Connect → Demo</span></div>` : ''}
+      ${askRate}
     </div><div class="divider"></div>`;
   } else {
     totalsEl.innerHTML = '';
@@ -1793,8 +1799,8 @@ function renderWeekDailySummary() {
         <span class="wsr-date">${fmtShort(e.date)}</span>
         <span class="wsr-skill">${e.skillFocus || '—'}</span>
         <span class="wsr-worked">${e.thingWorked ? e.thingWorked : '<span style="color:var(--text-muted)">no after-dials logged</span>'}</span>
-        ${e.connects || e.outcomeDemos || e.callbacks ? `<span style="font-size:11px;color:var(--text-muted);white-space:nowrap">
-          ${e.connects ? `${e.connects}c` : ''}${e.outcomeDemos ? ` · ${e.outcomeDemos}d` : ''}${e.callbacks ? ` · ${e.callbacks}cb` : ''}
+        ${e.connects || e.demosAsked || e.outcomeDemos || e.callbacks ? `<span style="font-size:11px;color:var(--text-muted);white-space:nowrap">
+          ${e.connects ? `${e.connects}c` : ''}${e.demosAsked ? ` · ${e.demosAsked}a` : ''}${e.outcomeDemos ? ` · ${e.outcomeDemos}d` : ''}${e.callbacks ? ` · ${e.callbacks}cb` : ''}
         </span>` : ''}
         ${e.rating ? `<span class="tag-r${e.rating}" style="font-size:11px;font-weight:700;white-space:nowrap">${RATING_LABELS[e.rating]}</span>` : ''}
       </div>
@@ -1825,7 +1831,6 @@ function saveWeekly() {
     synthesis: document.getElementById('w_synthesis').value.trim(),
     accountability: document.getElementById('w_accountability').value.trim(),
     winsLine: document.getElementById('w_winsLine').value.trim(),
-    winsRepeat: document.getElementById('w_winsRepeat').value.trim(),
     demoBooked: document.getElementById('w_demoBooked').value.trim(),
     demoMissed: document.getElementById('w_demoMissed').value.trim(),
     convosDied: document.getElementById('w_convosDied').value.trim(),
@@ -1971,13 +1976,14 @@ function getMonthDays(offset) {
 
 // Single pass over month days — returns activity stats + week keys for skill focus
 function getMonthData(offset) {
-  const stats = { connects: 0, demos: 0, callbacks: 0 };
+  const stats = { connects: 0, demosAsked: 0, demos: 0, callbacks: 0 };
   const weekKeys = new Set();
   getMonthDays(offset).forEach(ds => {
     const e = getDaily(ds);
-    stats.connects  += parseInt(e.connects)     || 0;
-    stats.demos     += parseInt(e.outcomeDemos) || 0;
-    stats.callbacks += parseInt(e.callbacks)    || 0;
+    stats.connects   += parseInt(e.connects)     || 0;
+    stats.demosAsked += parseInt(e.demosAsked)   || 0;
+    stats.demos      += parseInt(e.outcomeDemos) || 0;
+    stats.callbacks  += parseInt(e.callbacks)    || 0;
     const d  = new Date(ds + 'T12:00:00');
     const ws = new Date(d);
     ws.setDate(d.getDate() - d.getDay());
@@ -2013,12 +2019,13 @@ function renderMonthSummary() {
   if (!stats.connects && !stats.demos && !stats.callbacks) {
     summaryEl.innerHTML = '<div class="empty-state">No daily entries found for this month.</div>';
   } else {
-    const rate = stats.connects > 0 ? ((stats.demos / stats.connects) * 100).toFixed(0) + '%' : null;
+    const askRate = stats.demosAsked > 0 ? ((stats.demos / stats.demosAsked) * 100).toFixed(0) + '%' : null;
     summaryEl.innerHTML = `<div class="week-totals-row">
       <div class="week-total"><span class="week-total-num">${stats.connects}</span><span class="week-total-label">Connects</span></div>
+      ${stats.demosAsked ? `<div class="week-total"><span class="week-total-num" style="color:var(--text-muted)">${stats.demosAsked}</span><span class="week-total-label">Asked</span></div>` : ''}
       <div class="week-total"><span class="week-total-num" style="color:var(--green)">${stats.demos}</span><span class="week-total-label">Demos Booked</span></div>
       <div class="week-total"><span class="week-total-num" style="color:var(--amber)">${stats.callbacks}</span><span class="week-total-label">Callbacks</span></div>
-      ${rate ? `<div class="week-total"><span class="week-total-num" style="color:var(--accent)">${rate}</span><span class="week-total-label">Connect → Demo</span></div>` : ''}
+      ${askRate ? `<div class="week-total"><span class="week-total-num" style="color:var(--accent)">${askRate}</span><span class="week-total-label">Ask → Book</span></div>` : ''}
     </div>`;
   }
 
