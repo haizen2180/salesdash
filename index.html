@@ -874,6 +874,63 @@
     /* ── File input ── */
     input[type="file"] { display: none; }
 
+    /* ── Weekly Report ── */
+    .report-output { margin-bottom: 16px; }
+
+    .report-heading {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent);
+      margin: 18px 0 6px;
+    }
+    .report-heading:first-child { margin-top: 0; }
+
+    .report-para {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.65;
+      margin-bottom: 6px;
+    }
+
+    .report-bullet {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.65;
+      margin-bottom: 4px;
+      padding-left: 14px;
+      position: relative;
+    }
+    .report-bullet::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    .report-generating {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-muted);
+      font-size: 13px;
+      padding: 12px 0;
+    }
+
+    @keyframes reportSpin {
+      to { transform: rotate(360deg); }
+    }
+    .report-spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid var(--border-mid);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: reportSpin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
     /* ── Splash ── */
     #splash {
       position: fixed;
@@ -1185,6 +1242,32 @@
           <div class="field" style="margin-bottom:0">
             <label>What Worked — Write It Out and Commit to Repeating It Next Week</label>
             <textarea id="w_winsLine" class="short" placeholder="What exact thing did you say that moved a prospect toward booking? Write it word for word — don't let the win disappear."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weekly Report -->
+      <div class="section">
+        <div class="section-header">
+          <span class="section-icon">⚡</span>
+          <span class="section-title">Weekly Report</span>
+          <div class="section-badge" style="background:var(--accent-dim);color:var(--accent)">AI</div>
+        </div>
+        <div class="section-body">
+          <div id="reportKeySetup" style="display:none">
+            <div class="field">
+              <label>Anthropic API Key</label>
+              <div style="display:flex;gap:8px">
+                <input type="password" id="anthropicKey" placeholder="sk-ant-..." style="flex:1">
+                <button class="btn btn-secondary btn-sm" style="white-space:nowrap" onclick="saveApiKey()">Save Key</button>
+              </div>
+              <div class="char-hint" style="margin-top:6px">Stored only on your machine. Only sent to Anthropic's API when you generate a report.</div>
+            </div>
+          </div>
+          <div id="reportOutput" class="report-output" style="display:none"></div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <button class="btn btn-primary" id="reportBtn" onclick="generateWeeklyReport()">Generate Report</button>
+            <span style="font-size:12px;color:var(--text-muted);cursor:pointer;text-decoration:underline" onclick="toggleKeySetup()">API key</span>
           </div>
         </div>
       </div>
@@ -1776,6 +1859,168 @@ function renderPatternLog() {
       <button class="log-delete" onclick="deletePatternEntry('${e.date}')" title="Delete">×</button>
     </div>
   `}).join('') + '</div>';
+}
+
+// ── Weekly Report ────────────────────────────────────────
+function saveApiKey() {
+  const key = document.getElementById('anthropicKey').value.trim();
+  if (!key) { showToast('Enter a key first'); return; }
+  localStorage.setItem('anthropicApiKey', key);
+  document.getElementById('reportKeySetup').style.display = 'none';
+  document.getElementById('anthropicKey').value = '';
+  showToast('API key saved');
+}
+
+function toggleKeySetup() {
+  const el = document.getElementById('reportKeySetup');
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+async function generateWeeklyReport() {
+  const apiKey = localStorage.getItem('anthropicApiKey');
+  if (!apiKey) {
+    document.getElementById('reportKeySetup').style.display = 'block';
+    showToast('Enter your API key first');
+    return;
+  }
+
+  const btn    = document.getElementById('reportBtn');
+  const output = document.getElementById('reportOutput');
+
+  btn.disabled    = true;
+  btn.textContent = 'Generating...';
+  output.innerHTML = '<div class="report-generating"><div class="report-spinner"></div>Analyzing your week...</div>';
+  output.style.display = 'block';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-allow-browser': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-opus-4-6',
+        max_tokens: 1024,
+        messages: [{ role: 'user', content: buildReportPrompt() }]
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error?.message || `API error ${res.status}`);
+    }
+
+    const data = await res.json();
+    output.innerHTML = renderReport(data.content[0].text);
+  } catch (err) {
+    output.innerHTML = `<div class="report-para" style="color:var(--red)">Error: ${err.message}</div>`;
+    showToast('Report failed — check your API key');
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = 'Generate Report';
+  }
+}
+
+function buildReportPrompt() {
+  const weekLabel = document.getElementById('weekLabel').textContent;
+  const { start } = getWeekBounds(currentWeekOffset);
+  const w = JSON.parse(localStorage.getItem(getWeekKey(currentWeekOffset)) || '{}');
+
+  const totals = { connects: 0, demosAsked: 0, demos: 0, callbacks: 0 };
+  const dailyLines = [];
+  const skillRatings = {};
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    const ds = d.toISOString().split('T')[0];
+    const e  = getDaily(ds);
+    if (!e.skillFocus && !e.connects && !e.thingWorked && !e.rating) continue;
+
+    totals.connects   += parseInt(e.connects)     || 0;
+    totals.demosAsked += parseInt(e.demosAsked)   || 0;
+    totals.demos      += parseInt(e.outcomeDemos) || 0;
+    totals.callbacks  += parseInt(e.callbacks)    || 0;
+
+    if (e.skillFocus && e.rating) {
+      if (!skillRatings[e.skillFocus]) skillRatings[e.skillFocus] = [];
+      skillRatings[e.skillFocus].push(e.rating);
+    }
+
+    dailyLines.push([
+      fmtShort(ds),
+      e.skillFocus  ? `skill: ${e.skillFocus}`              : '',
+      e.rating      ? `rating: ${RATING_LABELS[e.rating]}`  : '',
+      e.connects    ? `${e.connects} connects`               : '',
+      e.demosAsked  ? `${e.demosAsked} asked`                : '',
+      e.outcomeDemos? `${e.outcomeDemos} booked`             : '',
+      e.thingWorked ? `worked: "${e.thingWorked}"`           : '',
+      e.thingChanged? `adjusted: "${e.thingChanged}"`        : '',
+      e.blockedBy   ? `blocked by: "${e.blockedBy}"`         : '',
+    ].filter(Boolean).join(' | '));
+  }
+
+  const skillSummary = Object.entries(skillRatings)
+    .map(([s, r]) => `${s}: ${(r.reduce((a,b)=>a+b,0)/r.length).toFixed(1)}/3 (${r.length} sessions)`)
+    .join(', ') || 'none logged';
+
+  const askRate = totals.demosAsked > 0
+    ? ((totals.demos / totals.demosAsked) * 100).toFixed(0) + '%'
+    : 'n/a';
+
+  return `You are analyzing a sales rep's weekly cold call data. Their sole goal is booking demos. Be direct and opinionated — tell them what the data actually means, not what they want to hear.
+
+WEEK: ${weekLabel}
+
+NUMBERS:
+Connects: ${totals.connects} | Asked for demo: ${totals.demosAsked} | Demos Booked: ${totals.demos} | Callbacks: ${totals.callbacks} | Ask→Book rate: ${askRate}
+
+DAILY LOG:
+${dailyLines.join('\n') || 'No daily entries logged this week.'}
+
+SKILL EXECUTION:
+${skillSummary}
+
+THEIR OWN ANALYSIS:
+Pattern they identified: ${w.synthesis     || 'not filled in'}
+Accountability check-in: ${w.accountability|| 'not filled in'}
+What worked:             ${w.winsLine      || 'not filled in'}
+
+CALL BREAKDOWN:
+Calls that booked — common factors: ${w.demoBooked  || 'not filled in'}
+Calls that didn't book:              ${w.demoMissed  || 'not filled in'}
+Where conversations died:            ${w.convosDied  || 'not filled in'}
+What prospects said before lost:     ${w.lostMoment  || 'not filled in'}
+Main brush-off this week:            ${w.weAreGood   || 'not filled in'}
+Their planned reframe:               ${w.couldHaveSaid|| 'not filled in'}
+
+Write a weekly report with exactly three sections using these exact headers:
+
+WHAT THE NUMBERS TELL YOU
+THE ONE THING HOLDING YOU BACK
+NEXT WEEK
+
+Rules: under 280 words total. Second person. No fluff or encouragement. If the data shows a clear problem, name it plainly. For "NEXT WEEK", give 2–3 specific behaviors — actual words to say or concrete actions, not vague direction.`;
+}
+
+function renderReport(text) {
+  const HEADERS = ['WHAT THE NUMBERS TELL YOU', 'THE ONE THING HOLDING YOU BACK', 'NEXT WEEK'];
+  let html = '';
+  text.split('\n').forEach(raw => {
+    const line = raw.trim();
+    if (!line) return;
+    if (HEADERS.some(h => line.toUpperCase().includes(h))) {
+      html += `<div class="report-heading">${line.replace(/^\d+[\.\-\)]\s*/, '')}</div>`;
+    } else if (/^[-•]\s/.test(line)) {
+      html += `<div class="report-bullet">${line.slice(2)}</div>`;
+    } else {
+      html += `<div class="report-para">${line}</div>`;
+    }
+  });
+  return html;
 }
 
 // ── Weekly ───────────────────────────────────────────────
