@@ -4,9 +4,24 @@
   "description": "Sales call tracking dashboard",
   "main": "main.js",
   "scripts": {
-    "start": "./node_modules/.bin/electron ."
+    "start": "./node_modules/.bin/electron .",
+    "build": "./node_modules/.bin/electron-builder --mac"
+  },
+  "build": {
+    "appId": "com.salesdash.app",
+    "productName": "SalesDash",
+    "files": [
+      "index.html",
+      "main.js"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "icon.icns",
+      "target": "dir"
+    }
   },
   "devDependencies": {
-    "electron": "^34.0.0"
+    "electron": "^34.0.0",
+    "electron-builder": "^26.8.1"
   }
 }
