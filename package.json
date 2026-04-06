@@ -4,7 +4,7 @@
   "description": "Sales call tracking dashboard",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "./node_modules/.bin/electron ."
   },
   "devDependencies": {
     "electron": "^34.0.0"
