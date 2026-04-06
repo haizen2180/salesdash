@@ -1450,14 +1450,9 @@ function handleKeyDown(e) {
   if ((e.metaKey || e.ctrlKey) && e.key === 's') {
     e.preventDefault();
     if (activeTab === 'daily') {
-      // determine which section has focus
-      const afterFields = ['thingWorked', 'thingChanged'];
-      const focused = document.activeElement?.id;
-      if (afterFields.includes(focused) || selectedRating > 0) {
-        saveAfter();
-      } else {
-        saveBefore();
-      }
+      saveBefore(true);
+      saveAfter(true);
+      showToast('Daily entry saved');
     } else if (activeTab === 'weekly') {
       saveWeekly();
     } else if (activeTab === 'monthly') {
@@ -1600,7 +1595,7 @@ function getDaily(date) {
   return JSON.parse(localStorage.getItem('daily_' + date) || '{}');
 }
 
-function saveBefore() {
+function saveBefore(silent = false) {
   const date = document.getElementById('dailyDate').value;
   const data = getDaily(date);
   data.skillFocus = document.getElementById('skillFocus').value.trim();
@@ -1609,10 +1604,10 @@ function saveBefore() {
   data.responseToday = document.getElementById('responseToday').value.trim();
   localStorage.setItem('daily_' + date, JSON.stringify(data));
   renderWeekStrip(date);
-  showToast('Before dials saved');
+  if (!silent) showToast('Before dials saved');
 }
 
-function saveAfter() {
+function saveAfter(silent = false) {
   const date = document.getElementById('dailyDate').value;
   const data = getDaily(date);
   data.rating = selectedRating;
@@ -1627,7 +1622,7 @@ function saveAfter() {
   if (data.thingWorked || data.thingChanged || data.connects) addToPatternLog(date, data);
   renderWeekStrip(date);
   renderPatternLog();
-  showToast('After dials saved');
+  if (!silent) showToast('After dials saved');
 }
 
 function selectRating(n) {
