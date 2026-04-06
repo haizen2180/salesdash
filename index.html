@@ -957,10 +957,8 @@
 
 <!-- ── Splash Screen ── -->
 <div id="splash">
-  <div class="splash-logo">SalesDash</div>
   <div class="splash-dot-wrap" onclick="launchDash()">
     <div class="splash-dot"></div>
-    <div class="splash-hint">tap to open</div>
   </div>
 </div>
 
@@ -1409,11 +1407,6 @@ function launchDash() {
   const splash = document.getElementById('splash');
   const logo   = document.querySelector('.splash-logo');
   const hint   = document.querySelector('.splash-hint');
-
-  logo.style.transition = 'opacity 0.15s ease';
-  hint.style.transition = 'opacity 0.15s ease';
-  logo.style.opacity    = '0';
-  hint.style.opacity    = '0';
 
   wrap.classList.add('launching');
 
