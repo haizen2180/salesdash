@@ -1,0 +1,12 @@
+{
+  "name": "salesdash",
+  "version": "1.0.0",
+  "description": "Sales call tracking dashboard",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^34.0.0"
+  }
+}
