@@ -1868,7 +1868,7 @@ function saveApiKey() {
   localStorage.setItem('anthropicApiKey', key);
   document.getElementById('reportKeySetup').style.display = 'none';
   document.getElementById('anthropicKey').value = '';
-  showToast('API key saved');
+  generateWeeklyReport();
 }
 
 function toggleKeySetup() {
